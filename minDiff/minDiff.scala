@@ -26,27 +26,20 @@ def getNearestValue(i: Int, list: Iterable[Int]): Int = {
   }
 }
 
-def getMinDiffElements(list1: Array[Int], list2: Array[Int]): (Int, Int) = {
-  //maximum bad functional style, using var instead of val...
-  var list1val = Int.MinValue
-  var list2val = Int.MinValue
-  var bestDiff = Int.MaxValue
-
-  //iterate over n elements
-  for(i <- list1) {
-    //log(n) search for neighbor
+def getMinDiffElements(list1: Iterable[Int], list2: Iterable[Int]): (Int, Int) = {
+  if (list1.size == 1) {
+    (list1.head, getNearestValue(list1.head, list2))
+  }
+  else {
+    val i = list1.head
     val neighbor = getNearestValue(i, list2)
 
-    //some constant time stuff c
-    val diff = math.abs(i - neighbor)
-    if (bestDiff > diff) {
-      bestDiff = diff
-      list1val = i
-      list2val = neighbor
-    }
+    val nextPair = getMinDiffElements(list1.tail, list2)
+    if (math.abs(i - neighbor) <= math.abs(nextPair._1 - nextPair._2))
+      (i, neighbor)
+    else
+      nextPair
   }
-  //for a grand total of n(log(n) + c) = nlog(n)
-  return (list1val, list2val)
 }
 
 val testVals = List(
@@ -64,4 +57,3 @@ testVals.foreach(lists => {
   println()
 })
 
-//println(getNearestValue(5, Array(6,9,12,13,14)))
