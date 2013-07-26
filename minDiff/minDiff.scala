@@ -9,17 +9,20 @@
 //Output:
 //[5, 6]
 
+//requires a sorted list with no repeated vals
 //binary search by pairs, log(n) runtime
-def getNearestValue(i: Int, list: Array[Int]): Int = {
-  if (list.length == 1) {
-    return list(0)
+def getNearestValue(i: Int, list: Iterable[Int]): Int = {
+  if (list.size == 1) {
+    list.head
   }
   else {
-    val midIdx = (list.length-1)/2
-    if (math.abs(i - list(midIdx)) < math.abs(i - list(midIdx+1)))
-      getNearestValue(i, list.splitAt(midIdx+1)._1)
+    val mid = list.size/2
+    val bot = list.dropRight(mid+(list.size % 2))
+    val top = list.drop(mid)
+    if (math.abs(i - bot.last) <= math.abs(i - top.head))
+      getNearestValue(i, bot)
     else
-      getNearestValue(i, list.splitAt(midIdx+1)._2)
+      getNearestValue(i, top)
   }
 }
 
@@ -61,3 +64,4 @@ testVals.foreach(lists => {
   println()
 })
 
+//println(getNearestValue(5, Array(6,9,12,13,14)))
