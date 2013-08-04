@@ -6,4 +6,6 @@ def penultimate[T](list: List[T]): T = {
     penultimate(list.tail)
 }
 
-println(penultimate(List(1, 1, 2, 3, 5, 8)))
+val e = penultimate(List(1, 1, 2, 3, 5, 8))
+println(e)
+assert(e == 5)

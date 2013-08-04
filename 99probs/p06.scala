@@ -11,11 +11,19 @@ def isPalindrome[T](list: List[T]): Boolean = {
 }
 
 val testVals = List(
-  List(1, 2, 3, 2, 1),
-  List(1, 1, 3, 2, 1),
-  List(1, 2, 2, 1),
-  List(1, 1, 2, 1),
-  List(1)
+  (List(1, 2, 3, 2, 1), true),
+  (List(1, 1, 3, 2, 1), false),
+  (List(1, 2, 2, 1), true),
+  (List(1, 1, 2, 1), false),
+  (List(1), true)
 )
 
-testVals.foreach(list => println("isPalindrome("+list+") = "+isPalindrome(list)))
+testVals.foreach(testPair => {
+  val list = testPair._1
+  val expected = testPair._2
+  val isPal = isPalindrome(list)
+
+  println("isPalindrome("+list+") = "+isPal)
+  assert(expected == isPal)
+})
+

@@ -6,4 +6,6 @@ def flatten(nestedList: List[Any]): List[Any] = {
   }
 }
 
-println(flatten(List(List(1, 1), 2, List(3, List(5, 8)))))
+val flat = flatten(List(List(1, 1), 2, List(3, List(5, 8))))
+println(flat)
+assert(flat == List(1, 1, 2, 3, 5, 8))

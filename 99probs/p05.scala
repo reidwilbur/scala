@@ -10,4 +10,6 @@ def reverse[T](list: List[T]): List[T] = {
   reverseAcc(Nil, list)
 }
 
-println(reverse(List(1, 1, 2, 3, 5, 8)))
+val r = reverse(List(1, 1, 2, 3, 5, 8))
+println(r)
+assert(r == List(8, 5, 3, 2, 1, 1))

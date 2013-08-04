@@ -10,4 +10,6 @@ def length[T](list: List[T]): Int = {
   lengthAcc(0, list)
 }
 
-println(length(List(1, 1, 2, 3, 5, 8)))
+val l = length(List(1, 1, 2, 3, 5, 8)) 
+println(l)
+assert(l == 6)
