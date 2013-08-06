@@ -6,6 +6,10 @@ class Index(
 ) {
 
   override def toString: String = {
+    "{"+row+" "+col+"}"
+  }
+
+  def debugString: String = {
     value+" {"+row+" "+col+"}"
   }
 }
@@ -17,7 +21,7 @@ abstract class Line(
 
   def getMatchIndexes(keyword: String): List[Index] = {
     def checkGenerateIndex(i: Int, idxList: List[Index]): List[Index] = {
-      println(i+" "+keyword+" "+idxList)
+      //println(i+" "+keyword+" ("+idxList.map(_.debugString).mkString(" ")+")")
       if (i == keyword.length)
         idxList.reverse.init
       else if (idxList.head == null)
@@ -54,6 +58,16 @@ class UpRightLine(
   }
 }
 
+class UpLeftLine(
+  origin: Index, 
+  puzzle: Puzzle
+) extends Line(origin, puzzle) {
+
+  override def getNextIndex(idx: Index): Index = {
+    puzzle.aboveLeft(idx)
+  }
+}
+
 class RightLine(
   origin: Index, 
   puzzle: Puzzle
@@ -64,6 +78,16 @@ class RightLine(
   }
 }
 
+class LeftLine(
+  origin: Index, 
+  puzzle: Puzzle
+) extends Line(origin, puzzle) {
+
+  override def getNextIndex(idx: Index): Index = {
+    puzzle.left(idx)
+  }
+}
+
 class DownRightLine(
   origin: Index, 
   puzzle: Puzzle
@@ -71,6 +95,16 @@ class DownRightLine(
 
   override def getNextIndex(idx: Index): Index = {
     puzzle.belowRight(idx)
+  }
+}
+
+class DownLeftLine(
+  origin: Index, 
+  puzzle: Puzzle
+) extends Line(origin, puzzle) {
+
+  override def getNextIndex(idx: Index): Index = {
+    puzzle.belowLeft(idx)
   }
 }
 
@@ -97,29 +131,50 @@ class Puzzle(c: String, s: Int) {
   }
 
   def aboveRight(idx: Index): Index = {
-    if (idx.col < width && idx.row > 0)
+    if (idx.col < width-1 && idx.row > 0)
       new Index(idx.row-1, idx.col+1, contents.charAt( ((idx.row-1)*width)+idx.col+1))
     else
       null
   }
 
+  def aboveLeft(idx: Index): Index = {
+    if (idx.col > 0 && idx.row > 0)
+      new Index(idx.row-1, idx.col-1, contents.charAt( ((idx.row-1)*width)+idx.col-1))
+    else
+      null
+  }
+
   def right(idx: Index): Index = {
-    if (idx.col < width)
+    if (idx.col < width-1)
       new Index(idx.row, idx.col+1, contents.charAt(idx.row*width+idx.col+1))
     else
       null
   }
 
+  def left(idx: Index): Index = {
+    if (idx.col > 0)
+      new Index(idx.row, idx.col-1, contents.charAt(idx.row*width+idx.col+1))
+    else
+      null
+  }
+
   def belowRight(idx: Index): Index = {
-    if (idx.col < width && idx.row < height)
+    if (idx.col < width-1 && idx.row < height-1)
       new Index(idx.row+1, idx.col+1, contents.charAt((idx.row+1)*width+idx.col+1))
     else
       null
   }
 
   def below(idx: Index): Index = {
-    if (idx.row < height)
+    if (idx.row < height-1)
       new Index(idx.row+1, idx.col, contents.charAt((idx.row+1)*width+idx.col))
+    else
+      null
+  }
+
+  def belowLeft(idx: Index): Index = {
+    if (idx.col > 0 && idx.row < height-1)
+      new Index(idx.row+1, idx.col-1, contents.charAt((idx.row+1)*width+idx.col-1))
     else
       null
   }
@@ -138,11 +193,13 @@ class Puzzle(c: String, s: Int) {
      val i = contents.indexOf(c, flatIdx)
      if (i == -1)
        null
-     else 
+     else {
+       //println("Found "+c+" at "+i)
        new Index(i/width, i%width, contents.charAt(i))
+     }
   }
 
-  def findInIndex(keyword: String, idx: Index): List[Index] = {
+  def findAtIndex(keyword: String, idx: Index): List[Index] = {
      def findTR(lines: List[Line]): List[Index] = {
        if (lines == Nil)
          Nil
@@ -159,8 +216,11 @@ class Puzzle(c: String, s: Int) {
        List(
          new UpLine(idx, this), 
          new UpRightLine(idx, this), 
+         new UpLeftLine(idx, this), 
          new RightLine(idx, this), 
+         new LeftLine(idx, this), 
          new DownRightLine(idx, this),
+         new DownLeftLine(idx, this),
          new DownLine(idx, this)
        )
      )
@@ -171,30 +231,34 @@ class Puzzle(c: String, s: Int) {
       if (index == null)
         Nil
       else {
-        val matchedIndexes = findInIndex(keyword, index)
+        val matchedIndexes = findAtIndex(keyword, index)
         if (matchedIndexes != Nil)
           matchedIndexes
         else
-          findTR(next(index))
+          findTR(nextIndexOf(keyword.charAt(0), next(index)))
       }
     }
     
-    findTR(firstIndex)
+    findTR(nextIndexOf(keyword.charAt(0), firstIndex))
   }
 
-}
+  override def toString: String = {
+    def getLines(lineIdx: Int, lines: List[String]): List[String] = {
+      if (lineIdx < height) {
+        val line = "["+contents.substring(lineIdx*width, (lineIdx+1)*width).mkString(" ")+"]"
+        getLines(lineIdx+1, line +: lines)
+      }
+      else
+        lines.reverse
+    }
 
-//val idx = new Index(41, 10)
-//val vline = new VertLine(idx, "asdf")
-//println(idx)
-//println(vline.getMatchIndexes("asd"))
-//println(vline.getMatchIndexes("asf"))
-//
-//val hline = new HorizLine(idx, "asdf")
-//println(hline.getMatchIndexes("asdf"))
-//println(hline.getMatchIndexes("asf"))
+    getLines(0, Nil).mkString("\n")
+  }
+}
 
 val puzzle = new Puzzle("SCALAALHPCUAMNJWAYDXBOSRVSTRVOYOAWKHUQZPJVUEOSNNPFOKLNTLMCEGULA", 9)
 
-val words = List("SCALA", "HASKEL", "PYTHON", "ML", "JS", "RUST", "AWK", "JAVA", "LUA", "CPP", "GO")
-words.foreach(word => println(word+" "+puzzle.find(word)))
+val words = List("SCALA", "HASKELL", "PYTHON", "ML", "JS", "RUST", "AWK", "JAVA", "LUA", "CPP", "GO")
+println(puzzle)
+println
+words.foreach(word => println(word+" ["+puzzle.find(word).mkString(" ")+"]"))
