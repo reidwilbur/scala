@@ -1,21 +1,16 @@
 
 def compress(list: List[Any]): List[Any] = {
-  def compressTR[T](compList: List[T], list: List[T]): List[T] = {
-    if (list == Nil) {
-      compList.reverse
+  def compressTR[T](compList: List[T], list: List[T]): List[T] = 
+    list match {
+      case List() => compList.reverse
+      case x :: xs if (x != compList.head) => compressTR(x :: compList, xs)
+      case x :: xs => compressTR(compList, xs)
     }
-    else if (compList == Nil) {
-      compressTR(list.head +: compList, list.tail)
-    }
-    else if (compList.head == list.head) {
-      compressTR(compList, list.tail)
-    }
-    else {
-      compressTR(list.head +: compList, list.tail)
-    }
+    
+  list match {
+    case List() => List()
+    case _ => compressTR(list.head :: Nil, list)
   }
-
-  compressTR(Nil, list)
 }
 
 val l = compress(List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e))
