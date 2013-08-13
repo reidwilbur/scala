@@ -1,15 +1,16 @@
 
 def encode[T](list: List[T]): List[Any] = {
-  def packTR[T](packed: List[Any], flat: List[T]): List[Any] = {
-    if (flat == Nil)
-      packed.reverse
-    else {
-      val (pack, process) = flat.span(el => el == flat.head)
-      if (pack.length == 1)
-        packTR(pack.head +: packed, process)
-      else
-        packTR((pack.length, pack.head) +: packed, process)
-    }
+  def packTR[T](packed: List[Any], flat: List[T]): List[Any] = 
+    flat match {
+      case List() => packed.reverse
+      case _ =>
+        val (pack, process) = flat.span(el => el == flat.head)
+        pack match {
+          case x :: List() =>
+            packTR(x :: packed, process)
+          case _ =>
+            packTR((pack.length, pack.head) :: packed, process)
+        }
   }
 
   packTR(Nil, list)
