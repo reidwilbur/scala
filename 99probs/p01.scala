@@ -1,9 +1,8 @@
 
-def last[T](list: List[T]): T = {
-  if (list.size == 1) 
-    list.head
-  else
-    last(list.tail)
+def last[T](list: List[T]): T = list match {
+  case List() => throw new RuntimeException("No last element for empty list")
+  case x :: List() => x
+  case x :: xs => last(xs)
 }
 
 val l = last(List(1, 1, 2, 3, 5, 8))
