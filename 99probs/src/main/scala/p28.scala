@@ -1,23 +1,32 @@
 package ninetynineprobs {
   object p28 {
     def lsort[T](list: List[List[T]]): List[List[T]] = {
-      def lsortTR[T](listsByLen: Map[Int, List[T]], currList: List[List[T]]): List[List[T]] = {
-        currList match {
+      list.sortWith { _.length < _.length }
+    }
+
+    def lsortFreq[T](list: List[List[T]]): List[List[T]] = {
+      def lsortFreqTR[T](listsByLen: Map[Int, List[List[T]]], listOfLists: List[List[T]]): List[List[T]] = {
+        listOfLists match {
           case Nil => 
-            listsByLen.keySet().toList().sorted().flatMap { key => listsByLen(key) }
-          case x :: xs =>
-            val l = x.length
-            val m = listsByLen(l) match {
-              case None =>
-                listsByLen += (l -> x :: Nil)
-              case _ =>
-                listsByLen += (l -> x :: listsByLen(l)) 
-            }
-            lsortTR(m, xs)
+            val listsInIncLenFreq = 
+              listsByLen.values.toList.sortWith{ _.length < _.length }
+
+            listsInIncLenFreq.flatMap(lists => { lists.reverse })
+
+          case list :: rest =>
+            val len = list.length
+
+            val lenList = 
+              if(listsByLen.contains(len))
+                listsByLen(len)
+              else
+                List()
+
+            lsortFreqTR(listsByLen + (len -> (list :: lenList)), rest)
         }
       }
 
-      lsortTR(Map.empty, list)
+      lsortFreqTR(Map.empty, list)
     }
   }
 }
