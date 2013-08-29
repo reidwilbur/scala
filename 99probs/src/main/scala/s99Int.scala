@@ -19,6 +19,20 @@ package ninetynineprobs {
       }
     }
 
+    def isCoPrimeTo(i: Int): Boolean =
+      gcd(start, i) == 1
+
+    def totient: Int = {
+      (1 until this.start).filter{ this.isCoPrimeTo(_) }.length
+    }
+
+    def primeFactors: List[Int] = {
+      if (this.isPrime)
+        List(this.start)
+      else {
+      }
+      
+    }
   }
 
   object S99Int {
