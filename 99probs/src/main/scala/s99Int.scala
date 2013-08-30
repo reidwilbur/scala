@@ -44,6 +44,33 @@ package ninetynineprobs {
 
       findPrimeFactors(this.start, primes, Nil)
     }
+
+    def primeFactorMultiplicity: Map[Int, Int] = {
+      def collectFactors(factors: List[Int], factorCounts: Map[Int, Int]): Map[Int, Int] = 
+        factors match {
+          case Nil => factorCounts
+          case f :: rest =>
+            val count = 
+              if (factorCounts.contains(f)) 
+                factorCounts(f) + 1 
+              else 
+                1
+            collectFactors(rest, factorCounts + (f -> count))
+        }
+      
+      collectFactors(this.primeFactors, Map.empty)
+    }
+
+    def totientFromPrimeFactors: Int = {
+      this.primeFactorMultiplicity.foldLeft(1)( 
+        (totientAcc, entry) => {
+          val factor = entry._1
+          val count  = entry._2
+          totientAcc*(factor-1)*(math.pow(factor, count-1).toInt)
+        } 
+      )
+    }
+
   }
 
   object S99Int {
