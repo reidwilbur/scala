@@ -27,16 +27,29 @@ package ninetynineprobs {
     }
 
     def primeFactors: List[Int] = {
-      if (this.isPrime)
-        List(this.start)
-      else {
+      def findPrimeFactors(dividend: Int, primes: Stream[Int], primeFactors: List[Int]): List[Int] = {
+        val currPrime = primes.head
+        val quotient = dividend / currPrime
+        val rem = dividend % currPrime
+
+        (quotient, rem) match {
+          case (1, 0) => 
+            (currPrime :: primeFactors).reverse
+          case (_, 0) =>
+            findPrimeFactors(quotient, primes, currPrime :: primeFactors)
+          case (_, _) =>
+            findPrimeFactors(dividend, primes.tail, primeFactors)
+        }
       }
-      
+
+      findPrimeFactors(this.start, primes, Nil)
     }
   }
 
   object S99Int {
     implicit def int2S99Int(i: Int): S99Int = new S99Int(i)
+    
+    val primes = Stream.cons(2, Stream.from(3, 2) filter { _.isPrime })
 
     def gcd(a: Int, b: Int): Int = {
       val r = a % b
