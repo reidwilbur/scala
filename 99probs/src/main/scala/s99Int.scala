@@ -51,7 +51,7 @@ package ninetynineprobs {
           case Nil => factorCounts
           case f :: rest =>
             val count = 
-              if (factorCounts.contains(f)) 
+              if (factorCounts.contains(f))
                 factorCounts(f) + 1 
               else 
                 1
@@ -71,6 +71,25 @@ package ninetynineprobs {
       )
     }
 
+    def goldbach: (Int, Int) = {
+      throw new RuntimeException("not implemented")
+      //if (this.start % 2 != 0) throw new IllegalArgumentException("Must be even integer")
+      //if (this.start < 2) throw new IllegalArgumentException("Must be greater than 1")
+
+      //def getPrimeAddends(addends: List[Int], primes: List[Int]): (Int, Int) = {
+      //  val sum = addends.head + addends.tail.head
+      //  sum match {
+      //    case _ if (sum == this.start) => 
+      //      (addends.head, addends.tail.head)
+      //    case _ if (sum > this.start) =>
+      //      getPrimeAddends()
+      //  }
+      //}
+
+      //val primes = listPrimesinRange(1, this.start)
+      //getPrimeAddends(primes, primes)
+    }
+
   }
 
   object S99Int {
@@ -85,6 +104,10 @@ package ninetynineprobs {
         b
       else
         gcd(b, r)
+    }
+
+    def listPrimesinRange(r: Range): List[Int] = {
+      r filter { _.isPrime } toList
     }
 
   }
