@@ -72,22 +72,24 @@ package ninetynineprobs {
     }
 
     def goldbach: (Int, Int) = {
-      throw new RuntimeException("not implemented")
-      //if (this.start % 2 != 0) throw new IllegalArgumentException("Must be even integer")
-      //if (this.start < 2) throw new IllegalArgumentException("Must be greater than 1")
+      if (this.start % 2 != 0) throw new IllegalArgumentException("Must be even integer")
+      if (this.start < 2) throw new IllegalArgumentException("Must be greater than 1")
 
-      //def getPrimeAddends(addends: List[Int], primes: List[Int]): (Int, Int) = {
-      //  val sum = addends.head + addends.tail.head
-      //  sum match {
-      //    case _ if (sum == this.start) => 
-      //      (addends.head, addends.tail.head)
-      //    case _ if (sum > this.start) =>
-      //      getPrimeAddends()
-      //  }
-      //}
+      def getPrimeAddends(primes: List[Int], addends: List[Int]): (Int, Int) = {
+        (primes, addends) match {
+          case (_, Nil) =>
+            getPrimeAddends(primes.tail, primes.tail)
+          case (a :: as, b :: bs) if (a+b == this.start) => 
+            (a, b)
+          case (a :: as, b :: bs) if (a+b > this.start) =>
+            getPrimeAddends(primes.tail, primes.tail)
+          case (_, _) =>
+            getPrimeAddends(primes, addends.tail)
+        }
+      }
 
-      //val primes = listPrimesinRange(1, this.start)
-      //getPrimeAddends(primes, primes)
+      val primes = listPrimesinRange(1 until this.start)
+      getPrimeAddends(primes, primes)
     }
 
   }
