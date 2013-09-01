@@ -73,7 +73,7 @@ package ninetynineprobs {
 
     def goldbach: (Int, Int) = {
       if (this.start % 2 != 0) throw new IllegalArgumentException("Must be even integer")
-      if (this.start < 2) throw new IllegalArgumentException("Must be greater than 1")
+      if (this.start < 3) throw new IllegalArgumentException("Must be greater than 2")
 
       def getPrimeAddends(primes: List[Int], addends: List[Int]): (Int, Int) = {
         (primes, addends) match {
@@ -88,8 +88,12 @@ package ninetynineprobs {
         }
       }
 
-      val primes = listPrimesinRange(1 until this.start)
+      val primes = listPrimesinRange(2 until this.start)
       getPrimeAddends(primes, primes)
+    }
+
+    def toGoldbachSum: GoldbachSum = {
+      GoldbachSum(this.start, this.goldbach)
     }
 
   }
@@ -110,6 +114,26 @@ package ninetynineprobs {
 
     def listPrimesinRange(r: Range): List[Int] = {
       r filter { _.isPrime } toList
+    }
+
+    case class GoldbachSum(val sum: Int, val addends: (Int, Int)) {
+      override def toString = {
+        sum+" = "+addends._1+" + "+addends._2
+      }
+    }
+
+    def getGoldbachList(r: Range): List[GoldbachSum] = {
+      r.filter{ i => (i > 2) && (i % 2 == 0) }
+       .toList
+       .map{ _.toGoldbachSum }
+    }
+
+    def getGoldbachListLimited(r: Range, limit: Int): List[GoldbachSum] = {
+      getGoldbachList(r)
+       .filter{ 
+         case GoldbachSum(_, (a, b)) if (a >= limit && b >= limit) => true
+         case _ => false
+       }
     }
 
   }
