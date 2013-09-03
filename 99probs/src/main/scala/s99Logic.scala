@@ -69,5 +69,45 @@ package ninetynineprobs {
       ) lb += ("%-5s %-5s %s".format(a, b, f(a,b)))
       lb.toList
     }
+
+    def gray(n: Int): List[String] = 
+      n match {
+        case 0 => Nil
+        case 1 => List("0", "1")
+        case _ =>
+          val l = gray(n-1)
+          val r = l.reverse
+          l.map { "0"+_ } ::: r.map { "1"+_ }
+      }
+
+    val grayMap = collection.mutable.Map[Int, List[String]](0 -> Nil, 1 -> List("0", "1"))
+    def grayMemo(n: Int): List[String] = {
+      if (!grayMap.contains(n)) {
+        val l = grayMemo(n-1)
+        val r = l.reverse
+        val codes = l.map { "0"+_ } ::: r.map { "1"+_ }
+        grayMap += (n -> codes)
+      }
+
+      grayMap(n)
+    }
+
+    def huffman[T](symFreqList: List[(T, Int)]): List[(T, String)] = {
+      def huffmanTR[T](
+        symList: List[(T, Int)], 
+        curCode: String, 
+        symCodes: List[(T, String)]
+      ): List[(T, String)] 
+        = 
+        symList match {
+          case (sym, _) :: Nil =>
+            ((sym, curCode+"1") :: symCodes).reverse
+          case (sym, _) :: rest =>
+            huffmanTR(rest, curCode+"1", (sym, curCode+"0") :: symCodes)
+        }
+
+      huffmanTR(symFreqList, "", Nil)
+    }
+
   }
 }
