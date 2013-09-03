@@ -15,7 +15,8 @@ package ninetynineprobs {
       println("Exp:")
       println(exp)
 
-      assert(codes == exp)
+      assert(codes.length == exp.length)
+      exp.foreach { code => assert( codes.contains(code) ) }
     }
 
   }

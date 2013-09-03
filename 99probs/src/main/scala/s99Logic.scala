@@ -92,21 +92,47 @@ package ninetynineprobs {
       grayMap(n)
     }
 
-    def huffman[T](symFreqList: List[(T, Int)]): List[(T, String)] = {
-      def huffmanTR[T](
-        symList: List[(T, Int)], 
-        curCode: String, 
-        symCodes: List[(T, String)]
-      ): List[(T, String)] 
-        = 
-        symList match {
-          case (sym, _) :: Nil =>
-            ((sym, curCode+"1") :: symCodes).reverse
-          case (sym, _) :: rest =>
-            huffmanTR(rest, curCode+"1", (sym, curCode+"0") :: symCodes)
-        }
+    case class HuffNode(val symbol: String, val freq: Int, val child1: HuffNode, val child2: HuffNode) {
+    }
 
-      huffmanTR(symFreqList, "", Nil)
+    object HuffNodeOrdering extends Ordering[HuffNode] {
+      def compare(a: HuffNode, b:HuffNode): Int = 
+        if (a.freq < b.freq)
+          1
+        else if (a.freq > b.freq)
+          -1
+        else
+          0
+    }
+
+    def huffman(symFreqList: List[(String, Int)]): List[(String, String)] = {
+      def walkTree(node: HuffNode, code: String): List[(String, String)] = {
+        node match {
+          case HuffNode(sym, _, _, _) if (sym != null) => 
+            (sym, code) :: Nil
+          case HuffNode(_, _, c1, c2) =>
+            walkTree(c1, code+"0") ::: walkTree(c2, code+"1")
+        }
+      }
+
+      import collection.mutable.PriorityQueue
+
+      val q = new PriorityQueue[HuffNode]()(HuffNodeOrdering)
+
+      symFreqList.foreach { t => q += new HuffNode(t._1, t._2, null, null) }
+
+      while(q.size != 1) {
+        val node1 = q.dequeue()
+        val node2 = q.dequeue()
+
+        val par12 = HuffNode(null, node1.freq+node2.freq, node1, node2)
+
+        q += par12
+      }
+
+      val head = q.dequeue()
+
+      walkTree(head, "")
     }
 
   }
