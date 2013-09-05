@@ -70,6 +70,7 @@ package ninetynineprobs {
       lb.toList
     }
 
+    //create the gray full gray code in n bits
     def gray(n: Int): List[String] = 
       n match {
         case 0 => Nil
@@ -81,6 +82,7 @@ package ninetynineprobs {
       }
 
     val grayMap = collection.mutable.Map[Int, List[String]](0 -> Nil, 1 -> List("0", "1"))
+    //memoized version of gray code above
     def grayMemo(n: Int): List[String] = {
       if (!grayMap.contains(n)) {
         val l = grayMemo(n-1)
@@ -93,10 +95,10 @@ package ninetynineprobs {
     }
 
     case class HuffNode(
-      val symbol: String, 
+      val symbol: Option[String], 
       val freq: Int, 
-      val child1: HuffNode, 
-      val child2: HuffNode) {
+      val child1: Option[HuffNode], 
+      val child2: Option[HuffNode]) {
     }
 
     object HuffNodeOrdering extends Ordering[HuffNode] {
@@ -114,9 +116,9 @@ package ninetynineprobs {
     def huffmanMut(symFreqList: List[(String, Int)]): List[(String, String)] = {
       def walkTree(node: HuffNode, code: String): List[(String, String)] = {
         node match {
-          case HuffNode(sym, _, _, _) if (sym != null) => 
+          case HuffNode(Some(sym), _, _, _) => 
             (sym, code) :: Nil
-          case HuffNode(_, _, c1, c2) =>
+          case HuffNode(_, _, Some(c1), Some(c2)) =>
             walkTree(c1, code+"0") ::: walkTree(c2, code+"1")
           case _ =>
             throw new RuntimeException("tree's effed up bro, got a wacky node: "+node)
@@ -128,13 +130,13 @@ package ninetynineprobs {
 
         val q = new PriorityQueue[HuffNode]()(HuffNodeOrdering)
 
-        symFreqList.foreach { t => q += new HuffNode(t._1, t._2, null, null) }
+        symFreqList.foreach { t => q += new HuffNode(Some(t._1), t._2, None, None) }
 
         while(q.size != 1) {
           val node1 = q.dequeue()
           val node2 = q.dequeue()
 
-          val par12 = HuffNode(null, node1.freq+node2.freq, node1, node2)
+          val par12 = HuffNode(None, node1.freq+node2.freq, Some(node1), Some(node2))
 
           q += par12
         }
@@ -152,9 +154,9 @@ package ninetynineprobs {
     def huffmanImm(symFreqList: List[(String, Int)]): List[(String, String)] = {
       def walkTree(node: HuffNode, code: String): List[(String, String)] = {
         node match {
-          case HuffNode(sym, _, _, _) if (sym != null) => 
+          case HuffNode(Some(sym), _, _, _) => 
             (sym, code) :: Nil
-          case HuffNode(_, _, c1, c2) =>
+          case HuffNode(_, _, Some(c1), Some(c2)) =>
             walkTree(c1, code+"0") ::: walkTree(c2, code+"1")
           case _ =>
             throw new RuntimeException("tree's effed up bro, got a wacky node: "+node)
@@ -190,13 +192,13 @@ package ninetynineprobs {
           val (n1, q1,  q2) = getLowestNode(leafQ, resQ)
           val (n2, nextLeafQ, nextResQ) = getLowestNode(q1, q2)
 
-          val pn = HuffNode(null, n1.freq+n2.freq, n1, n2)
+          val pn = HuffNode(None, n1.freq+n2.freq, Some(n1), Some(n2))
 
           buildTreeAndWalkIm(nextLeafQ, nextResQ.enqueue(pn))
         }
       }
 
-      val leafNodesAscFreq = symFreqList.map{ pair => HuffNode(pair._1, pair._2, null, null) }.sortWith{ _.freq < _.freq}
+      val leafNodesAscFreq = symFreqList.map{ pair => HuffNode(Some(pair._1), pair._2, None, None) }.sortWith{ _.freq < _.freq}
       val leafQ: Queue[HuffNode] = Queue.empty.enqueue(leafNodesAscFreq)
 
       buildTreeAndWalkIm(leafQ, Queue.empty)
