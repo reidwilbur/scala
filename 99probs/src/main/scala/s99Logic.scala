@@ -94,27 +94,17 @@ package ninetynineprobs {
       grayMap(n)
     }
 
-    case class HuffNode(
-      val symbol: Option[String], 
+    case class HuffNode[T](
+      val symbol: Option[T], 
       val freq: Int, 
-      val child1: Option[HuffNode], 
-      val child2: Option[HuffNode]) {
-    }
-
-    object HuffNodeOrdering extends Ordering[HuffNode] {
-      def compare(a: HuffNode, b:HuffNode): Int = 
-        if (a.freq < b.freq)
-          1
-        else if (a.freq > b.freq)
-          -1
-        else
-          0
+      val child1: Option[HuffNode[T]], 
+      val child2: Option[HuffNode[T]]) {
     }
 
     // this impl uses the scala mutable priority queue to implement the single
     // queue approach from here http://en.wikipedia.org/wiki/Huffman_coding#Basic_technique
-    def huffmanMut(symFreqList: List[(String, Int)]): List[(String, String)] = {
-      def walkTree(node: HuffNode, code: String): List[(String, String)] = {
+    def huffmanMut[T](symFreqList: List[(T, Int)]): List[(T, String)] = {
+      def walkTree(node: HuffNode[T], code: String): List[(T, String)] = {
         node match {
           case HuffNode(Some(sym), _, _, _) => 
             (sym, code) :: Nil
@@ -125,18 +115,29 @@ package ninetynineprobs {
         }
       }
 
-      def buildTreeAndWalk: List[(String, String)] = {
+      def buildTreeAndWalk: List[(T, String)] = {
         import collection.mutable.PriorityQueue
 
-        val q = new PriorityQueue[HuffNode]()(HuffNodeOrdering)
+        val lowFreqPriority = new Ordering[HuffNode[T]] {
+          def compare(a: HuffNode[T], b:HuffNode[T]): Int = 
+            if (a.freq < b.freq)
+              1
+            else if (a.freq > b.freq)
+              -1
+            else
+              0
+        }
 
-        symFreqList.foreach { t => q += new HuffNode(Some(t._1), t._2, None, None) }
+        val q = new PriorityQueue[HuffNode[T]]()(lowFreqPriority)
+
+        val leaves = symFreqList.map { pair => HuffNode[T](Some(pair._1), pair._2, None, None) }
+        q ++= leaves
 
         while(q.size != 1) {
           val node1 = q.dequeue()
           val node2 = q.dequeue()
 
-          val par12 = HuffNode(None, node1.freq+node2.freq, Some(node1), Some(node2))
+          val par12 = HuffNode[T](None, node1.freq+node2.freq, Some(node1), Some(node2))
 
           q += par12
         }
@@ -151,8 +152,8 @@ package ninetynineprobs {
 
     // this impl uses 2 immutable scala queues to implement the double
     // queue approach from here http://en.wikipedia.org/wiki/Huffman_coding#Basic_technique
-    def huffmanImm(symFreqList: List[(String, Int)]): List[(String, String)] = {
-      def walkTree(node: HuffNode, code: String): List[(String, String)] = {
+    def huffmanImm[T](symFreqList: List[(T, Int)]): List[(T, String)] = {
+      def walkTree(node: HuffNode[T], code: String): List[(T, String)] = {
         node match {
           case HuffNode(Some(sym), _, _, _) => 
             (sym, code) :: Nil
@@ -167,9 +168,9 @@ package ninetynineprobs {
 
       //this assumes that there at least 1 node in q2
       def getLowestNode(
-        q1: Queue[HuffNode], 
-        q2: Queue[HuffNode]): 
-          (HuffNode, Queue[HuffNode], Queue[HuffNode]) = {
+        q1: Queue[HuffNode[T]], 
+        q2: Queue[HuffNode[T]]): 
+          (HuffNode[T], Queue[HuffNode[T]], Queue[HuffNode[T]]) = {
 
         (q1.headOption, q2.headOption) match {
           case (None, _) => 
@@ -185,21 +186,21 @@ package ninetynineprobs {
 
       //this requires initial conditions of leafQ full of leaf nodes in ascending frequency order
       //resQ emtpy
-      def buildTreeAndWalkIm(leafQ: Queue[HuffNode], resQ: Queue[HuffNode]): List[(String, String)] = {
+      def buildTreeAndWalkIm(leafQ: Queue[HuffNode[T]], resQ: Queue[HuffNode[T]]): List[(T, String)] = {
         if (leafQ.size == 0 && resQ.size == 1)
           walkTree(resQ.head, "")
         else {
           val (n1, q1,  q2) = getLowestNode(leafQ, resQ)
           val (n2, nextLeafQ, nextResQ) = getLowestNode(q1, q2)
 
-          val pn = HuffNode(None, n1.freq+n2.freq, Some(n1), Some(n2))
+          val pn = HuffNode[T](None, n1.freq+n2.freq, Some(n1), Some(n2))
 
           buildTreeAndWalkIm(nextLeafQ, nextResQ.enqueue(pn))
         }
       }
 
-      val leafNodesAscFreq = symFreqList.map{ pair => HuffNode(Some(pair._1), pair._2, None, None) }.sortWith{ _.freq < _.freq}
-      val leafQ: Queue[HuffNode] = Queue.empty.enqueue(leafNodesAscFreq)
+      val leafNodesAscFreq = symFreqList.map{ pair => HuffNode[T](Some(pair._1), pair._2, None, None) }.sortWith{ _.freq < _.freq}
+      val leafQ: Queue[HuffNode[T]] = Queue.empty.enqueue(leafNodesAscFreq)
 
       buildTreeAndWalkIm(leafQ, Queue.empty)
     }
