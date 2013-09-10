@@ -1,14 +1,36 @@
 package ninetynineprobs {
 package bintree {
 
-  sealed abstract class Tree[+T]
+  sealed abstract class Tree[+T] {
+    def isMirrorOf[S](tree: Tree[S]): Boolean;
+    def isSymmetric: Boolean;
+  }
 
   case class Node[+T](value: T, left: Tree[T], right: Tree[T]) extends Tree[T] {
     override def toString = "T(" + value.toString + " " + left.toString + " " + right.toString + ")"
+
+    override def isMirrorOf[S](tree: Tree[S]): Boolean =
+      tree match {
+        case Node(_, left, right) =>
+          this.left.isMirrorOf(right) && this.right.isMirrorOf(left)
+        case _ =>
+          false
+      }
+
+    override def isSymmetric: Boolean = left.isMirrorOf(right)
   }
 
   case object End extends Tree[Nothing] {
     override def toString = "."
+
+    override def isMirrorOf[S](tree: Tree[S]): Boolean = {
+      tree match {
+        case End => true
+        case _ => false
+      }
+    }
+
+    override def isSymmetric = true
   }
 
   object Node {
@@ -53,6 +75,7 @@ package bintree {
           for(l <- subtrees; r <- subtrees) yield(Node(value, l, r))
       }
     }
+
   }
 
 }
