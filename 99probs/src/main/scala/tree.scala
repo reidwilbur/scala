@@ -4,6 +4,7 @@ package bintree {
   sealed abstract class Tree[+T] {
     def isMirrorOf[S](tree: Tree[S]): Boolean;
     def isSymmetric: Boolean;
+    def addValue[U >: T <% Ordered[U]](x: U): Tree[U];
   }
 
   case class Node[+T](value: T, left: Tree[T], right: Tree[T]) extends Tree[T] {
@@ -18,6 +19,15 @@ package bintree {
       }
 
     override def isSymmetric: Boolean = left.isMirrorOf(right)
+
+    override def addValue[U >: T <% Ordered[U]](x: U): Tree[U] = {
+      x match {
+        case _ if (x > this.value) =>
+          Node(this.value, this.left, this.right.addValue(x))
+        case _ =>
+          Node(this.value, this.left.addValue(x), this.right)
+      }
+    }
   }
 
   case object End extends Tree[Nothing] {
@@ -31,6 +41,8 @@ package bintree {
     }
 
     override def isSymmetric = true
+
+    override def addValue[U <% Ordered[U]](x: U): Tree[U] = Node(x)
   }
 
   object Node {
@@ -74,6 +86,10 @@ package bintree {
           //new node
           for(l <- subtrees; r <- subtrees) yield(Node(value, l, r))
       }
+    }
+
+    def fromList[S <% Ordered[S]](list: List[S]): Tree[S] = {
+      list.foldLeft(End: Tree[S])( (t, el) => { t.addValue(el) } )
     }
 
   }
