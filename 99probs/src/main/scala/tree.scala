@@ -123,6 +123,18 @@ package bintree {
       }
     }
 
+    def minHbalNodes(height: Int): Int = {
+      height match {
+        case 0 => 0
+        case 1 => 1
+        case 2 => 2
+        case _ =>
+          val minH1 = minHbalNodes(height-1)
+          val minH2 = minHbalNodes(height-2)
+          minH1+minH2+1
+      }
+    }
+
   }
 
 }
