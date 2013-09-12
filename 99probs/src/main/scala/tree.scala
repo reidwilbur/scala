@@ -95,6 +95,34 @@ package bintree {
     def symmetricBalancedTrees[T](nodes: Int, value: T): List[Tree[T]] = {
       cBalanced(nodes, value).filter( _.isSymmetric )
     }
+
+    def hBalanced[T](height: Int, value: T): List[Tree[T]] = {
+      height match {
+        case 0 => 
+          Nil
+        case 1 =>
+          List(
+            Node(value)
+          )
+        case 2 =>
+          List(
+            Node(value, Node(value), End), 
+            Node(value, End, Node(value)), 
+            Node(value, Node(value), Node(value))
+          )
+        case _ =>
+          val subtrees1 = hBalanced(height-1, value)
+          val subtrees2 = hBalanced(height-2, value)
+          val sameHeight = 
+            for(l <- subtrees1; r <- subtrees1) yield(Node(value, l, r))
+          val longLeft =
+            for(l <- subtrees1; r <- subtrees2) yield(Node(value, l, r))
+          val longRight =
+            for(r <- subtrees1; l <- subtrees2) yield(Node(value, l, r))
+          sameHeight ::: longLeft ::: longRight
+      }
+    }
+
   }
 
 }
