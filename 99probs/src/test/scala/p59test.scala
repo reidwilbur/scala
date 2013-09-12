@@ -21,6 +21,42 @@ package bintree {
 
         Node('x,
           Node('x,
+            Node('x), 
+            End),
+          Node('x,
+            End,
+            Node('x))
+        ),
+
+        Node('x,
+          Node('x,
+            End, 
+            Node('x)),
+          Node('x,
+            Node('x),
+            End)
+        ),
+
+        Node('x,
+          Node('x,
+            Node('x), 
+            End),
+          Node('x,
+            Node('x),
+            End)
+        ),
+
+        Node('x,
+          Node('x,
+            End, 
+            Node('x)),
+          Node('x,
+            End,
+            Node('x))
+        ),
+
+        Node('x,
+          Node('x,
             End, 
             Node('x)),
           Node('x,
