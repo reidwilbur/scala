@@ -7,11 +7,19 @@ package bintree {
     def addValue[U >: T <% Ordered[U]](x: U): Tree[U];
     def nodeCount: Int;
     def height: Int;
+    def leafCount: Int;
+    def leafList: List[T];
+    def internalList: List[T]
+    def atLevel(level: Int): List[T]
   }
 
   case class Node[+T](value: T, left: Tree[T], right: Tree[T]) extends Tree[T] {
     val nodeCount = left.nodeCount + right.nodeCount + 1
     val height = math.max(left.height, right.height) + 1
+    val leafCount = (left, right) match {
+      case (End, End) => 1
+      case _ => left.leafCount + right.leafCount
+    }
 
     override def toString = "T(" + value.toString + " " + left.toString + " " + right.toString + ")"
 
@@ -33,6 +41,67 @@ package bintree {
           Node(this.value, this.left.addValue(x), this.right)
       }
     }
+
+    override def leafList: List[T] = {
+      def leafListTR(leafNodes: List[T], workingNodes: List[Tree[T]]): List[T] = 
+        workingNodes match {
+          case Nil => 
+            leafNodes
+
+          case Node(v, l, r) :: rest =>
+            val (nextLeaves, nextWorking) = 
+              (v, l, r) match { 
+                case (_, End, End) => (v :: leafNodes, rest)
+                case _             => (leafNodes, l :: r :: rest)
+              }
+            leafListTR(nextLeaves, nextWorking)
+
+          case _ :: rest =>
+            leafListTR(leafNodes, rest)
+        }
+
+      leafListTR(Nil, this :: Nil)
+    }
+
+    override def internalList: List[T] = {
+      def internalListTR(internalNodes: List[T], workingNodes: List[Tree[T]]): List[T] =
+        workingNodes match {
+          case Nil => 
+            internalNodes
+
+          case Node(v, l, r) :: rest =>
+            val (nextInternal, nextWorking) =
+              (v, l, r) match {
+                case (_, End, End) => (internalNodes, rest)
+                case _             => (v :: internalNodes, l :: r :: rest)
+              }
+            internalListTR(nextInternal, nextWorking)
+
+          case _ :: rest =>
+            internalListTR(internalNodes, rest)
+        }
+
+      internalListTR(Nil, this :: Nil)
+    }
+
+    override def atLevel(level: Int): List[T] = {
+      def atLevelTR(levelNodes: List[T], workingNodes: List[(Int, Tree[T])]): List[T] =
+        workingNodes match {
+          case Nil =>
+            levelNodes
+
+          case (nodeLevel, Node(v, _, _)) :: rest if (nodeLevel == level) =>
+            atLevelTR(v :: levelNodes, rest)
+
+          case (nodeLevel, Node(_, l, r)) :: rest =>
+            atLevelTR(levelNodes, (nodeLevel+1, l) :: (nodeLevel+1, r) :: rest)
+
+          case _ :: rest =>
+            atLevelTR(levelNodes, rest)
+        }
+
+      atLevelTR(Nil, (1, this) :: Nil)
+    }
   }
 
   case object End extends Tree[Nothing] {
@@ -52,6 +121,14 @@ package bintree {
     override def nodeCount = 0
 
     override def height = 0
+
+    override def leafCount = 0
+
+    override def leafList = Nil
+
+    override def internalList = Nil
+
+    override def atLevel(level: Int) = Nil
   }
 
   object Node {
