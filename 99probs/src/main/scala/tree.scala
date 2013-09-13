@@ -5,9 +5,14 @@ package bintree {
     def isMirrorOf[S](tree: Tree[S]): Boolean;
     def isSymmetric: Boolean;
     def addValue[U >: T <% Ordered[U]](x: U): Tree[U];
+    def nodeCount: Int;
+    def height: Int;
   }
 
   case class Node[+T](value: T, left: Tree[T], right: Tree[T]) extends Tree[T] {
+    val nodeCount = left.nodeCount + right.nodeCount + 1
+    val height = math.max(left.height, right.height) + 1
+
     override def toString = "T(" + value.toString + " " + left.toString + " " + right.toString + ")"
 
     override def isMirrorOf[S](tree: Tree[S]): Boolean =
@@ -28,6 +33,10 @@ package bintree {
           Node(this.value, this.left.addValue(x), this.right)
       }
     }
+
+    //override def nodeCount = this.nodeCount
+
+    //override def height = this.height
   }
 
   case object End extends Tree[Nothing] {
@@ -43,6 +52,10 @@ package bintree {
     override def isSymmetric = true
 
     override def addValue[U <% Ordered[U]](x: U): Tree[U] = Node(x)
+
+    override def nodeCount = 0
+
+    override def height = 0
   }
 
   object Node {
@@ -123,16 +136,21 @@ package bintree {
       }
     }
 
-    def minHbalNodes(height: Int): Int = {
-      height match {
-        case 0 => 0
-        case 1 => 1
-        case 2 => 2
-        case _ =>
-          val minH1 = minHbalNodes(height-1)
-          val minH2 = minHbalNodes(height-2)
-          minH1+minH2+1
+    def maxHbalHeight(nodes: Int): Int = {
+      math.floor(math.log(nodes)/math.log(2)).toInt + 1
+    }
+
+    def minHbalHeight(nodes: Int): Int = {
+      math.floor(math.log(nodes)/math.log(2)).toInt
+    }
+
+    def hbalTreesWithNodes[S](nodes: Int, value: S): List[Tree[S]] = {
+      for{
+        h <- (minHbalHeight(nodes) to maxHbalHeight(nodes)).toList
+        t <- hBalanced(h, value)
+        if t.nodeCount == nodes
       }
+      yield t
     }
 
   }
