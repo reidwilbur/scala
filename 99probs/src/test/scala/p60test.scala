@@ -49,12 +49,6 @@ package bintree {
       exp.foreach( expTree => assert( trees.contains(expTree) ) )
     }
 
-    test("Tree.hbalTreesWithNodes(15, 'x)") {
-      val trees = Tree.hbalTreesWithNodes(15, 'x)
-      println("Tree.hbalTreesWithNodes(15, 'x).length = "+trees.length)
-      println(trees)
-    }
-
   }
 
 }

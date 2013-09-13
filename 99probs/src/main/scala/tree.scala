@@ -33,10 +33,6 @@ package bintree {
           Node(this.value, this.left.addValue(x), this.right)
       }
     }
-
-    //override def nodeCount = this.nodeCount
-
-    //override def height = this.height
   }
 
   case object End extends Tree[Nothing] {
@@ -137,11 +133,11 @@ package bintree {
     }
 
     def maxHbalHeight(nodes: Int): Int = {
-      math.floor(math.log(nodes)/math.log(2)).toInt + 1
+      math.ceil((nodes-1)/2.0).toInt + 1
     }
 
     def minHbalHeight(nodes: Int): Int = {
-      math.floor(math.log(nodes)/math.log(2)).toInt
+      math.floor(math.log(nodes)/math.log(2)).toInt + 1
     }
 
     def hbalTreesWithNodes[S](nodes: Int, value: S): List[Tree[S]] = {
