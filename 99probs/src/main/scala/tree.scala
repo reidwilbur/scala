@@ -226,6 +226,45 @@ package bintree {
       yield t
     }
 
+    def completeBinaryTree[S](nodes: Int, value: S): Tree[S] = {
+      def collapseNodes(parNodes: List[Tree[S]], childNodes: List[Tree[S]]): List[Tree[S]] = {
+        childNodes match {
+          case Nil =>
+            parNodes.reverse
+          case left :: right :: rest =>
+            collapseNodes(Node(value, left, right) :: parNodes, rest)
+          case _ =>
+            throw new RuntimeException("childNodes list length not a power of 2")
+        }
+      }
+
+      def cBinTreeTR(childNodes: List[Tree[S]]): Tree[S] = {
+        childNodes match {
+          case h :: Nil =>
+            h
+          case _ =>
+            val parNodes = collapseNodes(Nil, childNodes)
+            cBinTreeTR(parNodes)
+        }
+      }
+
+      val log2Nodes = math.log(nodes)/math.log(2)
+      println("log2Nodes: "+log2Nodes)
+      val fullTreeCnt = math.pow(2, math.ceil(log2Nodes)).toInt - 1
+      println("fullTreeCnt: "+fullTreeCnt)
+      val lessLevelCnt = math.pow(2, math.floor(log2Nodes)).toInt - 1
+      println("lessLevelCnt: "+lessLevelCnt)
+      val endNodeCnt = fullTreeCnt - nodes
+      println("endNodeCnt: "+endNodeCnt)
+      val nodeCnt = nodes - lessLevelCnt
+      println("nodeCnt: "+nodeCnt)
+
+      val leaves = List.fill(nodeCnt)(Node(value)) ::: List.fill(endNodeCnt)(End)
+      println("leaves: "+leaves)
+
+      cBinTreeTR(leaves)
+    }
+
   }
 
 }
