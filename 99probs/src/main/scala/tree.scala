@@ -253,12 +253,12 @@ package bintree {
     }
 
     def completeBinaryTree[S](nodes: Int, value: S): Tree[S] = {
-      def collapseNodes(parNodes: List[Tree[S]], childNodes: List[Tree[S]]): List[Tree[S]] = {
+      def genParentNodes(parNodes: List[Tree[S]], childNodes: List[Tree[S]]): List[Tree[S]] = {
         childNodes match {
           case Nil =>
             parNodes.reverse
           case left :: right :: rest =>
-            collapseNodes(Node(value, left, right) :: parNodes, rest)
+            genParentNodes(Node(value, left, right) :: parNodes, rest)
           case _ =>
             throw new RuntimeException("childNodes list length not a power of 2")
         }
@@ -269,24 +269,21 @@ package bintree {
           case h :: Nil =>
             h
           case _ =>
-            val parNodes = collapseNodes(Nil, childNodes)
+            val parNodes = genParentNodes(Nil, childNodes)
             cBinTreeTR(parNodes)
         }
       }
 
-      val log2Nodes = math.log(nodes)/math.log(2)
-      println("log2Nodes: "+log2Nodes)
-      val fullTreeCnt = math.pow(2, math.ceil(log2Nodes)).toInt - 1
-      println("fullTreeCnt: "+fullTreeCnt)
-      val lessLevelCnt = math.pow(2, math.floor(log2Nodes)).toInt - 1
-      println("lessLevelCnt: "+lessLevelCnt)
-      val endNodeCnt = fullTreeCnt - nodes
-      println("endNodeCnt: "+endNodeCnt)
-      val nodeCnt = nodes - lessLevelCnt
-      println("nodeCnt: "+nodeCnt)
+      def genLeafNodes(currNodeCnt: Int, nextNodesCnt: Int): List[Tree[S]] =
+        if ((nodes >= currNodeCnt) && (nodes <= currNodeCnt + nextNodesCnt)) {
+          val endNodeCnt = currNodeCnt + nextNodesCnt - nodes
+          val nodeCnt = nodes - currNodeCnt
+          List.fill(nodeCnt)(Node(value)) ::: List.fill(endNodeCnt)(End)
+        }
+        else
+          genLeafNodes(currNodeCnt+nextNodesCnt, nextNodesCnt*2)
 
-      val leaves = List.fill(nodeCnt)(Node(value)) ::: List.fill(endNodeCnt)(End)
-      println("leaves: "+leaves)
+      val leaves = genLeafNodes(1, 2)
 
       cBinTreeTR(leaves)
     }
