@@ -102,6 +102,32 @@ package bintree {
 
       atLevelTR(Nil, (1, this) :: Nil)
     }
+
+    def layoutBinaryTree: Tree[T] = {
+      def inOrderDfs(node: Tree[T], idx: Int, lvl: Int): (Tree[T], Int) = {
+        node match {
+          case End => (End, idx)
+          case Node(v, l, r) =>
+            val (left, leftIdx) = inOrderDfs(l, idx, lvl+1)
+            val x = leftIdx + 1
+            val (right, rightIdx) = inOrderDfs(r, x, lvl+1)
+            (PositionedNode(v, left, right, x, lvl), rightIdx)
+        }
+      }
+
+      inOrderDfs(this, 0, 1)._1
+    }
+  }
+
+  case class PositionedNode[+T](
+    override val value: T, 
+    override val left: Tree[T], 
+    override val right: Tree[T], 
+    x: Int, 
+    y: Int) 
+  extends Node[T](value, left, right) {
+
+    override def toString = "T[" + x.toString + "," + y.toString + "](" + value.toString + " " + left.toString + " " + right.toString + ")"
   }
 
   case object End extends Tree[Nothing] {
