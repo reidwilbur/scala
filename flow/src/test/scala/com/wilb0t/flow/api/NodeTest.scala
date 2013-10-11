@@ -13,15 +13,11 @@ case class FailExit() extends ExitPort {
   val description = "Node Failed"
 }
 
-class FailNode(val name: String) extends FlowNode with Logging {
+class FailNode(val name: String) extends Executable with Logging {
   override def execute: ExitPort = {
     logger.info(name+" Executing")
 
     FailExit()
-  }
-
-  override def nextNode(exitPort: ExitPort): Option[FlowNode] = {
-    None
   }
 
   override def toString: String = {

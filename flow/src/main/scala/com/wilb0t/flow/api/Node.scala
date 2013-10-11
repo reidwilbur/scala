@@ -7,13 +7,12 @@ abstract class ExitPort {
   def description: String
 }
 
-trait Executable {
-  def name: String
+trait Action {
   def execute: ExitPort
 }
 
-abstract class FlowNode extends Executable {
-  def nextNode(exitPort: ExitPort): Option[FlowNode]
+class FlowNode(val name: String, val nodeAction: Action, val nextNodes: Map[ExitPort, FlowNode]) {
+  def nextNode(exitPort: ExitPort): Option[FlowNode] = nextNodes.get(exitPort)
 }
 
 class Flow(val head: FlowNode) extends Logging {
