@@ -13,7 +13,10 @@ trait Action {
   def execute: ExitPort
 }
 
-class FlowNode(val name: String, val action: Action, val exitPorts: Map[ExitPort, String]) extends Logging {
+class FlowNode(
+  val name: String, 
+  val action: Action, 
+  val exitPorts: Map[ExitPort, String]) extends Logging {
 
   def execute: (ExitPort, Option[String]) = {
     logger.info("Executing node "+name)
@@ -27,7 +30,10 @@ class FlowNode(val name: String, val action: Action, val exitPorts: Map[ExitPort
   }
 }
 
-class EndFlowNode(name: String, action: Action) extends FlowNode(name, action, Map.empty) {
+class EndFlowNode(
+  name: String, 
+  action: Action) extends FlowNode(name, action, Map.empty) {
+
   override def execute: (ExitPort, Option[String]) = {
     logger.info("Executing node "+name)
     val exitPort = action.execute
