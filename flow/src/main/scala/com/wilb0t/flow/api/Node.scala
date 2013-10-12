@@ -10,7 +10,8 @@ abstract class ExitPort {
 }
 
 trait FlowContext {
-  def name: String  
+  def name: String
+  override def toString: String = "FlowContext:"+name
 }
 
 trait Action {
@@ -50,14 +51,20 @@ class Flow(name: String, val nodes: List[FlowNode]) extends Logging {
   val nodeMap: Map[String, FlowNode] = 
     nodes.foldLeft(Map[String, FlowNode]())( (m, n) => m + (n.name -> n))
 
-  def execute: List[(FlowNode, ExitPort)] = {
-    def execNode(node: Option[FlowNode], path: List[(FlowNode, ExitPort)]): List[(FlowNode, ExitPort)] = {
+  def execute: List[(FlowNode, Map[FlowContext, ExitPort])] = {
+    def execNode(
+        node: Option[FlowNode], 
+        path: List[(FlowNode, Map[FlowContext, ExitPort])]
+      )
+      : List[(FlowNode, Map[FlowContext, ExitPort])] = {
+
       node match {
         case None => 
           logger.info("Flow finished")
           path.reverse
         case Some(n) =>
-          val (exitPort, nextNodeName) = n.execute(new FlowContext { val name = "Main" })
+          val context = new FlowContext { val name = "Main" }
+          val (exitPort, nextNodeName) = n.execute(context)
           logger.info("Got exit port: "+exitPort)
           logger.info("Next node: "+nextNodeName)
           val nextNode = 
@@ -65,7 +72,7 @@ class Flow(name: String, val nodes: List[FlowNode]) extends Logging {
               case Some(name) => nodeMap.get(name)
               case _ => None
             }
-          execNode(nextNode, (n, exitPort) :: path)
+          execNode(nextNode, (n, Map(context -> exitPort)) :: path)
       }
 
     }
