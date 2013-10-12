@@ -77,7 +77,7 @@ class Flow(name: String, val nodes: List[FlowNode]) extends Logging {
 
     }
     
-    logger.info("Starting flow")
+    logger.info("Starting flow: "+name)
     execNode(nodes.headOption, Nil)
   }
 
