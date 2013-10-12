@@ -9,8 +9,12 @@ abstract class ExitPort {
   }
 }
 
+trait FlowContext {
+  def name: String  
+}
+
 trait Action {
-  def execute: ExitPort
+  def execute(context: FlowContext): ExitPort
 }
 
 class FlowNode(
@@ -18,9 +22,9 @@ class FlowNode(
   val action: Action, 
   val exitPorts: Map[ExitPort, String]) extends Logging {
 
-  def execute: (ExitPort, Option[String]) = {
-    logger.info("Executing node "+name)
-    val exitPort = action.execute
+  def execute(context: FlowContext): (ExitPort, Option[String]) = {
+    logger.info("Executing node "+name+" with context "+context.name)
+    val exitPort = action.execute(context)
     val nextNode = exitPorts(exitPort)
     (exitPort, Some(nextNode))
   }
@@ -34,9 +38,9 @@ class EndFlowNode(
   name: String, 
   action: Action) extends FlowNode(name, action, Map.empty) {
 
-  override def execute: (ExitPort, Option[String]) = {
-    logger.info("Executing node "+name)
-    val exitPort = action.execute
+  override def execute(context: FlowContext): (ExitPort, Option[String]) = {
+    logger.info("Executing node "+name+" with context "+context.name)
+    val exitPort = action.execute(context)
     (exitPort, None)
   }
 }
@@ -53,7 +57,7 @@ class Flow(name: String, val nodes: List[FlowNode]) extends Logging {
           logger.info("Flow finished")
           path.reverse
         case Some(n) =>
-          val (exitPort, nextNodeName) = n.execute
+          val (exitPort, nextNodeName) = n.execute(new FlowContext { val name = "Main" })
           logger.info("Got exit port: "+exitPort)
           logger.info("Next node: "+nextNodeName)
           val nextNode = 

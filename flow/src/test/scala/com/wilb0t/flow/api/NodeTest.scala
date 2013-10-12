@@ -12,7 +12,7 @@ case class FailExit() extends ExitPort {
 }
 
 class PassAction extends Action with Logging {
-  override def execute: ExitPort = {
+  override def execute(context: FlowContext): ExitPort = {
     logger.info("Emitting PassExit")
 
     PassExit()
@@ -20,7 +20,7 @@ class PassAction extends Action with Logging {
 }
 
 class FailAction extends Action with Logging {
-  override def execute: ExitPort = {
+  override def execute(context: FlowContext): ExitPort = {
     logger.info("Emitting FailExit")
 
     FailExit()
@@ -37,17 +37,29 @@ class FlowTest extends FunSuite with Logging {
               ( PassExit() -> "MidNode" ),
               ( FailExit() -> "EndNode" )
             )),
-            new FlowNode("MidNode", new PassAction(), Map[ExitPort, String](
+            new FlowNode("MidNode", new FailAction(), Map[ExitPort, String](
               ( PassExit() -> "EndNode" ),
               ( FailExit() -> "EndNode" )
             )),
-            new EndFlowNode("EndNode", new FailAction())
+            new EndFlowNode("EndNode", new PassAction())
             )
           )
 
 
     val path = flow.execute
+
     logger.info("Got path: "+path)
+
+    assert(path.size == 3)
+
+    assert(path(0)._1.name == "HeadNode")
+    assert(path(0)._2 == PassExit())
+
+    assert(path(1)._1.name == "MidNode")
+    assert(path(1)._2 == FailExit())
+
+    assert(path(2)._1.name == "EndNode")
+    assert(path(2)._2 == PassExit())
   }
 }
 
