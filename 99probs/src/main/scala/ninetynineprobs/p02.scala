@@ -1,3 +1,4 @@
+package ninetynineprobs
 
 object p02 {
    def penultimate[T](list: List[T]): T = list match {

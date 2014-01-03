@@ -1,3 +1,4 @@
+package ninetynineprobs
 
 object p11 {
   def encode[T](list: List[T]): List[Any] = {

@@ -1,3 +1,4 @@
+package ninetynineprobs
 
 object p22 {
   def range(start: Int, end: Int): List[Int] = {

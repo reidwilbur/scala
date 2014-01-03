@@ -1,3 +1,4 @@
+package ninetynineprobs
 
 import scala.reflect.ClassTag
 

@@ -1,3 +1,4 @@
+package ninetynineprobs.bintree
 
 sealed abstract class Tree[+T] {
   def isMirrorOf[S](tree: Tree[S]): Boolean;

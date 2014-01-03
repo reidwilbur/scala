@@ -1,3 +1,4 @@
+package ninetynineprobs
 
 case class Logic(val v: Boolean) {
    def and(b: Logic): Logic = {

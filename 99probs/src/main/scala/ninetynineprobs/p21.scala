@@ -1,3 +1,4 @@
+package ninetynineprobs
 
 object p21 {
   def insertAt[T](newEl: T, idx: Int, list: List[T]): List[T] = {

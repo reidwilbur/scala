@@ -1,3 +1,4 @@
+package ninetynineprobs
 
 object p03 {
    def nth[T](idx: Int, list: List[T]): T = list match {

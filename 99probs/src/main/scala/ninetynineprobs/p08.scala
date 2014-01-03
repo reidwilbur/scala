@@ -1,3 +1,4 @@
+package ninetynineprobs
 
 object p08 {
    def compress(list: List[Any]): List[Any] = {

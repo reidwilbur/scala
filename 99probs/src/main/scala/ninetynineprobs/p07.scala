@@ -1,3 +1,4 @@
+package ninetynineprobs
 
 object p07 {
    def flatten(nestedList: List[Any]): List[Any] = {

@@ -1,3 +1,4 @@
+package ninetynineprobs
 
 object p09 {
    def pack[T](list: List[T]): List[List[T]] = {

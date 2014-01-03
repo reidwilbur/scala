@@ -1,3 +1,4 @@
+package ninetynineprobs
 
 object p06 {
    def isPalindrome[T](list: List[T]): Boolean = {

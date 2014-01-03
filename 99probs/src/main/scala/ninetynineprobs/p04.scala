@@ -1,3 +1,4 @@
+package ninetynineprobs
 
 object p04 {
    def length[T](list: List[T]): Int = {

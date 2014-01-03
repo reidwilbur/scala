@@ -1,3 +1,4 @@
+package ninetynineprobs
 
 object p14 {
   def duplicate[T](list: List[T]): List[T] =

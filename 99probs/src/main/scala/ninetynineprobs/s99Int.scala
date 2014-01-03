@@ -1,3 +1,4 @@
+package ninetynineprobs
 
 class S99Int(val start: Int) {
    import S99Int._
