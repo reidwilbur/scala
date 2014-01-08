@@ -35,4 +35,16 @@ class ParenParserSuite extends FunSuite {
   test("case 7") {
     assert(Right(Error(2)) == ParenParser.checkParens("()("))
   }
+
+  test("case 8") {
+    assert(Right(Error(16)) == ParenParser.checkParens("asdf123(asdf)234(sdf"))
+  }
+
+  test("case 9") {
+    assert(Right(Error(2)) == ParenParser.checkParens("()))"))
+  }
+
+  test("case 10") {
+    assert(Right(Error(1)) == ParenParser.checkParens("((()"))
+  }
 }

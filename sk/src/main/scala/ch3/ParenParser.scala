@@ -13,29 +13,44 @@ object ParenParser {
   case class LP(idx: Int) extends Paren
   case class RP(idx: Int) extends Paren
   
-  def checkParens(input: String): Either[Success, Error] = {
-    def check(itr: Iterator[Char], stack: Stack[Paren], idx: Int): Stack[Paren] = {
-      if (!itr.hasNext)
-        stack
-      else {  
-        itr.next match {
-	      case '(' =>
-	        check(itr, stack.push(LP(idx)), idx+1)
-	          
-	      case ')' =>
-	        stack.headOption match {
-	          case Some(LP(_)) =>
-	            check(itr, stack.pop, idx+1)
-	          case _ =>
-	            check(itr, stack.push(RP(idx)), idx+1)
-	        }
-	          
-	      case _ =>
-	        check(itr, stack, idx+1)
-	    }
-      }
+  object LP {
+    def unapply(s: String): Option[String] = {
+       if (s.startsWith("(")) Some(s.tail) else None
     }
-    val stack = check(input.iterator, Stack(), 0)
+  }
+  
+  object RP {
+    def unapply(s: String): Option[String] = {
+       if (s.startsWith(")")) Some(s.tail) else None
+    }
+  }
+  
+  def checkParens(input: String): Either[Success, Error] = {
+    def check(parenStr: String, stack: Stack[Paren], idx: Int): Stack[Paren] = {
+        parenStr match {
+          case "" =>
+            stack
+            
+  	      case LP(tail) =>
+  	        check(tail, stack.push(LP(idx)), idx+1)
+  	          
+  	      case RP(tail) =>
+  	        stack.headOption match {
+              case None =>
+                stack.push(RP(idx))
+                
+  	          case Some(_: LP) =>
+  	            check(tail, stack.pop, idx+1)
+  	            
+  	          case Some(m) =>
+  	            throw new IllegalStateException(s"Head of stack is $m which should not be possible.")
+  	        }
+  	          
+  	      case s =>
+  	        check(s.tail, stack, idx+1)
+	      }
+    }
+    val stack = check(input, Stack(), 0)
     if (stack.isEmpty) Left(Success()) else Right(Error(stack.head.idx)) 
   }
 }
