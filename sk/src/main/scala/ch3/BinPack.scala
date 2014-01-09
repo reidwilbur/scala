@@ -20,17 +20,22 @@ object BinPack {
   }
   
   def pack(weights: List[Double])(implicit ordering: Ordering[Bin]): Int = {
+    //outer loop iteration n times
     val bins = weights.foldLeft(TreeSet[Bin]())
 	    { (bins, weight) =>
+	      //O(log n) to create in order iterator
 	      val possibleBins = bins.dropWhile{_.weightLeft < weight}
 	      possibleBins.headOption match {
 	        case Some(bin) =>
 	          val newBin = Bin(bin.weight + weight)
+	          //O(log n) + O(log n)
 	          (bins - bin) + newBin
 	        case None =>
+	          //O(log n)
 	          bins + Bin(weight)
 	      }
 	    }
+    //overall O(n (log n + 2log n)) = O(n log n) 
     
     bins.size    
   }
