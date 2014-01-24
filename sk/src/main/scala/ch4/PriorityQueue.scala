@@ -8,7 +8,7 @@ trait PriorityQueue[T] {
   def head: Option[T]
 }
 
-class VectorImpl[T](implicit val ordering: Ordering[T]) extends PriorityQueue[T] {
+class ArrayBufferImpl[T](implicit val ordering: Ordering[T]) extends PriorityQueue[T] {
   import scala.collection.mutable.ArrayBuffer
 
   protected var elements: ArrayBuffer[T] = ArrayBuffer.empty[T]
@@ -59,6 +59,29 @@ class VectorImpl[T](implicit val ordering: Ordering[T]) extends PriorityQueue[T]
     }
   }
   
+  private[ch4] def getMinValueIdx(idx: Int): Int = {
+    var minIdx = idx
+    var cIdx = leftChild(idx)
+    while(cIdx < numEls && cIdx <= rightChild(idx)) {
+      if (ordering.lt(elements(cIdx),elements(idx))) {
+        minIdx = cIdx
+      }
+      cIdx += 1
+    }
+    minIdx
+  }
+  
+  @tailrec
+  private[ch4] final def bubbleDown(idx: Int): Unit = {
+    val minValIdx = getMinValueIdx(idx)
+    if (minValIdx != idx) {
+      val tmp = elements(minValIdx)
+      elements(minValIdx) = elements(idx)
+      elements(idx) = tmp
+      bubbleDown(minValIdx)
+    }
+  }
+  
   override def head: Option[T] = {
     numEls match {
       case 0 => None
@@ -70,7 +93,15 @@ class VectorImpl[T](implicit val ordering: Ordering[T]) extends PriorityQueue[T]
     numEls match {
       case 0 => None
       case _ =>
-        None
+        val head = elements(0)
+        numEls -= 1
+        elements(0) = elements(numEls)
+        bubbleDown(0)
+        Some(head)
     }
+  }
+  
+  override def toString: String = {
+    s"[$numEls:$elements]"
   }
 }

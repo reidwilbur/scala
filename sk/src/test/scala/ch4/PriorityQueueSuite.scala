@@ -7,19 +7,19 @@ import org.scalatest.junit.JUnitRunner
 @RunWith(classOf[JUnitRunner])
 class PriorityQueueSuite extends FunSuite {
    test("head of empty q returns none") {
-     val queue = new VectorImpl[Int]()
+     val queue = new ArrayBufferImpl[Int]()
      assert(queue.head == None)
    }
    
    test("head returns inserted element") {
-     val queue = new VectorImpl[Int]()
+     val queue = new ArrayBufferImpl[Int]()
      
      queue.insert(3)
      assert(queue.head == Some(3))
    }
    
    test("insert maintains ordering") {
-     val queue = new VectorImpl[Int]()
+     val queue = new ArrayBufferImpl[Int]()
      
      queue.insert(3)
      assert(queue.head == Some(3))
@@ -35,7 +35,7 @@ class PriorityQueueSuite extends FunSuite {
    }
    
    test("parent calculates indexes correctly") {
-     val queue: VectorImpl[Int] = new VectorImpl[Int]
+     val queue: ArrayBufferImpl[Int] = new ArrayBufferImpl[Int]
      
      assert(queue.parent(0) == None)
      assert(queue.parent(1) == Some(0))
@@ -47,7 +47,7 @@ class PriorityQueueSuite extends FunSuite {
    }
    
    test("leftChild calculates indexes correctly") {
-     val queue: VectorImpl[Int] = new VectorImpl[Int]
+     val queue: ArrayBufferImpl[Int] = new ArrayBufferImpl[Int]
      
      assert(queue.leftChild(0) == 1)
      assert(queue.leftChild(1) == 3)
@@ -57,7 +57,7 @@ class PriorityQueueSuite extends FunSuite {
    }
    
    test("rightChild calculates indexes correctly") {
-     val queue = new VectorImpl[Int]
+     val queue = new ArrayBufferImpl[Int]
      
      assert(queue.rightChild(0) == 2)
      assert(queue.rightChild(1) == 4)
@@ -67,14 +67,24 @@ class PriorityQueueSuite extends FunSuite {
    }
    
    test("remove returns correct element and updates head") {
-     val queue = new VectorImpl[Int]
+     val queue = new ArrayBufferImpl[Int]
      
      queue.insert(3).insert(2).insert(1).insert(4)
      
+     assert(queue.head == Some(1))
+     
      assert(queue.remove == Some(1))
+     assert(queue.head == Some(2))
+     
      assert(queue.remove == Some(2))
+     assert(queue.head == Some(3))
+     
      assert(queue.remove == Some(3))
+     assert(queue.head == Some(4))
+     
      assert(queue.remove == Some(4))
+     assert(queue.head == None)
+     
      assert(queue.remove == None)
    }
 }
