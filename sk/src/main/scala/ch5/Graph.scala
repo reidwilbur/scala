@@ -3,10 +3,10 @@ package ch5
 import scala.collection.immutable.Queue
 
 case class Graph(
-  val edge: IndexedSeq[List[Edge]],
-  val edgeCount: Int,
-  val degree: IndexedSeq[Int],
-  val directed: Boolean) {
+  edge: IndexedSeq[List[Edge]],
+  edgeCount: Int,
+  degree: IndexedSeq[Int],
+  directed: Boolean) {
   assert(edge.size == degree.size)
 
   val vertexCount = edge.size
@@ -20,7 +20,7 @@ object Graph {
   def apply(vertices: Int, edges: List[(Int,Int)], directed: Boolean = false): Graph = {
     val edgeBuffer  = ArrayBuffer.fill[List[Edge]](vertices)(List.empty)
     val degree = ArrayBuffer.fill[Int](vertices)(0)
-    var edgeCount = 0;
+    var edgeCount = 0
 
     edges.foreach{ (e) =>
       assert(e._1 < vertices)
@@ -91,6 +91,7 @@ object Graph {
     }
 
     traverse(Queue[Int](root))
+
     BfsResult(vertexState, parent)
   }
 
@@ -100,11 +101,14 @@ object Graph {
 
     var c = 0
     var conComps = Map.empty[Int, Set[Int]]
+
+    def addVertexToComponent(v: Int): Unit = {
+      conComps = conComps + (c -> (conComps.getOrElse(c, Set[Int]()) + v))
+    }
+
     (0 until g.vertexCount).foreach{ i =>
       if (vertexState(i) == UnDiscovered) {
-        _bfs(
-          g, i, vertexState, parent
-        )(vertexEarly = {v: Int => conComps = conComps + (c -> conComps.getOrElse(c, Set[Int]()).+(v) ) })
+        _bfs(g, i, vertexState, parent)(vertexEarly = addVertexToComponent)
         c += 1
       }
     }
@@ -112,35 +116,36 @@ object Graph {
   }
 
   def isBiPartite(g: Graph): Boolean = {
-    val vertexState = ArrayBuffer.fill[VertexState](g.vertexCount)(UnDiscovered)
-    val parent = ArrayBuffer.fill[Option[Int]](g.vertexCount)(None)
-
     sealed abstract class Color
     case object NoColor extends Color
     case object White extends Color
     case object Black extends Color
 
-    def complement(c: Color): Color = {
+    def complement(c: Color): Color =
       c match {
         case NoColor => NoColor
         case Black => White
         case White => Black
       }
-    }
 
     val color = ArrayBuffer.fill[Color](g.vertexCount)(NoColor)
+    val vertexState = ArrayBuffer.fill[VertexState](g.vertexCount)(UnDiscovered)
+    val parent = ArrayBuffer.fill[Option[Int]](g.vertexCount)(None)
 
-    var bipartite = true;
+    var bipartite = true
+
+    def checkColors(v: Int, e: Edge): Unit = {
+      if (color(v) == color(e.vertex)) bipartite = false
+      color(e.vertex) = complement(color(v))
+    }
+
     (0 until g.vertexCount).foreach{ i =>
       if (vertexState(i) == UnDiscovered) {
         color(i) = White
       }
-      _bfs(g, i, vertexState, parent)(processEdge = {
-        (v, e) =>
-          if (color(v) == color(e.vertex)) bipartite = false
-          color(e.vertex) = complement(color(v))
-      })
+      _bfs(g, i, vertexState, parent)(processEdge = checkColors)
     }
+
     bipartite
   }
 }
