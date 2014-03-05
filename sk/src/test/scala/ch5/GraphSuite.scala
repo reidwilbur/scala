@@ -3,6 +3,7 @@ package ch5
 import org.scalatest.{FunSpec}
 import org.scalatest.junit.JUnitRunner
 import org.junit.runner.RunWith
+import ch5.Graph.{Processed, VertexState}
 
 @RunWith(classOf[JUnitRunner])
 class GraphSuite extends FunSpec {
@@ -158,4 +159,59 @@ class GraphSuite extends FunSpec {
       assert(false == Graph.isBiPartite(g))
     }
   }
+
+  describe("dfs on an undirected graph") {
+    it("should exhaust path before moving to next path") {
+      //    1
+      //   / \
+      // 0   3 - 4
+      //  \
+      //   2
+      val g = Graph(5, List((0,1), (0,2), (1,3), (3,4)))
+
+      var processedVerts = List.empty[Int]
+      Graph.dfs(g, 0)(vertexEarly = (v: Int) => processedVerts = v :: processedVerts)
+      assert(processedVerts == List(4,3,1,2,0))
+    }
+
+    //    1
+    //   / \
+    // 0   3 - 4
+    //  \
+    //   2
+    it("should return indexed seq of parent for each vertex") {
+      val g = Graph(5, List((0,1), (0,2), (1,3), (3,4)))
+
+      val result = Graph.dfs(g, 0)()
+
+      assert(result.parent == IndexedSeq[Option[Int]](None, Some(0), Some(0), Some(1), Some(3)))
+    }
+
+    //    1
+    //   / \
+    // 0   3 - 4
+    //  \ /
+    //   2
+    it("should process all edges once") {
+      val g = Graph(5, List((0,1), (0,2), (1,3), (2,3), (3,4)))
+
+      var edgeCount = 0;
+      Graph.dfs(g, 0)(processEdge = {(v, e) => edgeCount += 1})
+      assert(edgeCount == 5)
+    }
+
+    //    1
+    //   / \
+    // 0   3 - 4
+    //  \ /
+    //   2
+    it("should visit all connected vertices") {
+      val g = Graph(5, List((0,1), (0,2), (1,3), (2,3), (3,4)))
+
+      val result = Graph.dfs(g, 0)()
+
+      assert(result.vertexState == IndexedSeq[VertexState](Processed, Processed, Processed, Processed, Processed))
+    }
+  }
+
 }

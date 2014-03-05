@@ -1,6 +1,7 @@
 package ch5
 
-import scala.collection.immutable.Queue
+import scala.collection.immutable.{Stack, Queue}
+import scala.annotation.tailrec
 
 case class Graph(
   edge: IndexedSeq[List[Edge]],
@@ -44,12 +45,12 @@ object Graph {
   case object Discovered extends VertexState
   case object Processed extends VertexState
 
-  case class BfsResult(vertexState: IndexedSeq[VertexState], parent: IndexedSeq[Option[Int]])
+  case class SearchResult(vertexState: IndexedSeq[VertexState], parent: IndexedSeq[Option[Int]])
 
   def bfs(g: Graph, root: Int)
          (vertexEarly: (Int)  => Unit = {(v) =>},
           vertexLate:  (Int)  => Unit = {(v) =>},
-          processEdge: (Int, Edge) => Unit = {(r, e) =>}): BfsResult = {
+          processEdge: (Int, Edge) => Unit = {(r, e) =>}): SearchResult = {
     _bfs(
       g,
       root,
@@ -61,10 +62,11 @@ object Graph {
   private def _bfs(g: Graph, root: Int, vertexState: ArrayBuffer[VertexState], parent: ArrayBuffer[Option[Int]])
          (vertexEarly: (Int) => Unit = {(v) =>},
           vertexLate:  (Int) => Unit = {(v) =>},
-          processEdge: (Int, Edge) => Unit = {(r, e) =>}): BfsResult = {
+          processEdge: (Int, Edge) => Unit = {(r, e) =>}): SearchResult = {
     assert(root >= 0)
     assert(root < g.vertexCount)
 
+    @tailrec
     def traverse(vertexQueue: Queue[Int]): Unit = {
       if (vertexQueue.nonEmpty) {
         val (v, rest) = vertexQueue.dequeue
@@ -92,7 +94,68 @@ object Graph {
 
     traverse(Queue[Int](root))
 
-    BfsResult(vertexState, parent)
+    SearchResult(vertexState, parent)
+  }
+
+  def dfs(g: Graph, root: Int)
+         (vertexEarly: (Int) => Unit = {(v) =>},
+          vertexLate:  (Int) => Unit = {(v) =>},
+          processEdge: (Int, Edge) => Unit = {(v,e) =>}): SearchResult = {
+    val vertexState = ArrayBuffer.fill[VertexState](g.vertexCount)(UnDiscovered)
+    val parent = ArrayBuffer.fill[Option[Int]](g.vertexCount)(None)
+    val entry = ArrayBuffer.fill[Int](g.vertexCount)(0)
+    val exit = ArrayBuffer.fill[Int](g.vertexCount)(0)
+    var time = 0
+
+    @tailrec
+    def traverse(vertexStack: List[(Int, List[Edge])] ): Unit = {
+      vertexStack match {
+        case Nil =>
+        case (v, edges) :: rest =>
+          vertexState(v) match {
+            case UnDiscovered =>
+              vertexState(v) = Discovered
+              vertexEarly(v)
+
+              entry(v) = time
+              time += 1
+
+              traverse((v, g.edge(v)) :: rest)
+
+            case Discovered if (edges.isEmpty) =>
+              vertexLate(v)
+
+              vertexState(v) = Processed
+              exit(v) = time
+              time += 1
+
+              traverse(rest)
+
+            case Discovered =>
+              val e = edges.head
+              val nextStack = (v, edges.tail) :: rest
+              if (vertexState(e.vertex) == UnDiscovered) {
+                parent(e.vertex) = Some(v)
+                processEdge(v, e)
+                traverse((e.vertex, Nil) :: nextStack)
+              }
+              else if ((vertexState(e.vertex) != Processed && parent(v) != Some(e.vertex)) || g.directed) {
+                processEdge(v, e)
+                traverse(nextStack)
+              }
+              else {
+                traverse(nextStack)
+              }
+
+            case Processed =>
+              assert(false, "vertex "+v+" is in processed state and still in stack, should not be possible")
+          }
+      }
+    }
+
+    traverse(List((root, Nil)))
+
+    SearchResult(vertexState, parent)
   }
 
   def connectedComponents(g: Graph): Map[Int, Set[Int]] = {
