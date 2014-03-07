@@ -170,7 +170,7 @@ class GraphSuite extends FunSpec {
       val g = Graph(5, List((0,1), (0,2), (1,3), (3,4)))
 
       var processedVerts = List.empty[Int]
-      Graph.dfs(g, 0)(vertexEarly = (v: Int) => processedVerts = v :: processedVerts)
+      Graph.dfs(g, 0)(vertexEarly = { (v: Int) => processedVerts = v :: processedVerts; true })
       assert(processedVerts == List(4,3,1,2,0))
     }
 
@@ -196,7 +196,7 @@ class GraphSuite extends FunSpec {
       val g = Graph(5, List((0,1), (0,2), (1,3), (2,3), (3,4)))
 
       var edgeCount = 0;
-      Graph.dfs(g, 0)(processEdge = {(v, e) => edgeCount += 1})
+      Graph.dfs(g, 0)(processEdge = {(v, e) => edgeCount += 1; true})
       assert(edgeCount == 5)
     }
 
@@ -211,6 +211,30 @@ class GraphSuite extends FunSpec {
       val result = Graph.dfs(g, 0)()
 
       assert(result.vertexState == IndexedSeq[VertexState](Processed, Processed, Processed, Processed, Processed))
+    }
+  }
+
+  describe("hasCycle on undirected graph") {
+    //    1
+    //   / \
+    // 0   3 - 4
+    //  \ /
+    //   2
+    it("should return true if a cycle exists") {
+      val g = Graph(5, List((0,1), (0,2), (1,3), (2,3), (3,4)))
+
+      assert(true == Graph.hasCycle(g, 0))
+    }
+
+    //    1
+    //   / \
+    // 0   3 - 4
+    //  \
+    //   2
+    it("should return false if no cycle exists") {
+      val g = Graph(5, List((0,1), (0,2), (1,3), (3,4)))
+
+      assert(false == Graph.hasCycle(g, 0))
     }
   }
 

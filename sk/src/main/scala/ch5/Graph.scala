@@ -97,14 +97,47 @@ object Graph {
     SearchResult(vertexState, parent)
   }
 
-  def dfs(g: Graph, root: Int)
-         (vertexEarly: (Int) => Unit = {(v) =>},
-          vertexLate:  (Int) => Unit = {(v) =>},
-          processEdge: (Int, Edge) => Unit = {(v,e) =>}): SearchResult = {
+  def hasCycle(g: Graph, root: Int): Boolean = {
     val vertexState = ArrayBuffer.fill[VertexState](g.vertexCount)(UnDiscovered)
     val parent = ArrayBuffer.fill[Option[Int]](g.vertexCount)(None)
-    val entry = ArrayBuffer.fill[Int](g.vertexCount)(0)
-    val exit = ArrayBuffer.fill[Int](g.vertexCount)(0)
+    val entry = ArrayBuffer.fill[Option[Int]](g.vertexCount)(None)
+    val exit = ArrayBuffer.fill[Option[Int]](g.vertexCount)(None)
+
+    var hasCycle = false
+    def findBackEdge(v: Int, e: Edge): Boolean = {
+      if (vertexState(e.vertex) == Discovered && parent(v) != e.vertex) {
+        hasCycle = true
+        false
+      }
+      else true
+    }
+
+    _dfs(g, root, vertexState, parent, entry, exit)(processEdge = findBackEdge)
+
+    hasCycle
+  }
+
+  def dfs(g: Graph, root: Int)
+         (vertexEarly: (Int) => Boolean = {(v) => true},
+          vertexLate:  (Int) => Boolean = {(v) => true},
+          processEdge: (Int, Edge) => Boolean = {(v,e) => true}): SearchResult = {
+    _dfs(g,
+         root,
+         ArrayBuffer.fill[VertexState](g.vertexCount)(UnDiscovered),
+         ArrayBuffer.fill[Option[Int]](g.vertexCount)(None),
+         ArrayBuffer.fill[Option[Int]](g.vertexCount)(None),
+         ArrayBuffer.fill[Option[Int]](g.vertexCount)(None)
+        )(vertexEarly, vertexLate, processEdge)
+  }
+
+    private def _dfs(g: Graph, root: Int,
+          vertexState: ArrayBuffer[VertexState],
+          parent: ArrayBuffer[Option[Int]],
+          entry: ArrayBuffer[Option[Int]],
+          exit: ArrayBuffer[Option[Int]])
+         (vertexEarly: (Int) => Boolean = {(v) => true},
+          vertexLate:  (Int) => Boolean = {(v) => true},
+          processEdge: (Int, Edge) => Boolean = {(v,e) => true}): SearchResult = {
     var time = 0
 
     @tailrec
@@ -115,33 +148,33 @@ object Graph {
           vertexState(v) match {
             case UnDiscovered =>
               vertexState(v) = Discovered
-              vertexEarly(v)
+              val continue = vertexEarly(v)
 
-              entry(v) = time
+              entry(v) = Some(time)
               time += 1
 
-              traverse((v, g.edge(v)) :: rest)
+              if (continue) traverse((v, g.edge(v)) :: rest)
 
             case Discovered if (edges.isEmpty) =>
-              vertexLate(v)
+              val continue = vertexLate(v)
 
               vertexState(v) = Processed
-              exit(v) = time
+              exit(v) = Some(time)
               time += 1
 
-              traverse(rest)
+              if (continue) traverse(rest)
 
             case Discovered =>
               val e = edges.head
               val nextStack = (v, edges.tail) :: rest
               if (vertexState(e.vertex) == UnDiscovered) {
                 parent(e.vertex) = Some(v)
-                processEdge(v, e)
-                traverse((e.vertex, Nil) :: nextStack)
+                val continue = processEdge(v, e)
+                if (continue) traverse((e.vertex, Nil) :: nextStack)
               }
               else if ((vertexState(e.vertex) != Processed && parent(v) != Some(e.vertex)) || g.directed) {
-                processEdge(v, e)
-                traverse(nextStack)
+                val continue = processEdge(v, e)
+                if (continue) traverse(nextStack)
               }
               else {
                 traverse(nextStack)
