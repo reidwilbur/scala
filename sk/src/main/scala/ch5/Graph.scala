@@ -105,7 +105,7 @@ object Graph {
 
     var hasCycle = false
     def findBackEdge(v: Int, e: Edge): Boolean = {
-      if (vertexState(e.vertex) == Discovered && parent(v) != e.vertex) {
+      if ((vertexState(e.vertex) == Discovered) && (parent(v) != Some(e.vertex))) {
         hasCycle = true
         false
       }
@@ -243,5 +243,34 @@ object Graph {
     }
 
     bipartite
+  }
+
+  def topologicalSort(g: Graph): List[Int] = {
+    assert(g.directed, "Graph must be directed")
+
+    val vertexState = ArrayBuffer.fill[VertexState](g.vertexCount)(UnDiscovered)
+    val parent = ArrayBuffer.fill[Option[Int]](g.vertexCount)(None)
+    val entry = ArrayBuffer.fill[Option[Int]](g.vertexCount)(None)
+    val exit = ArrayBuffer.fill[Option[Int]](g.vertexCount)(None)
+
+    var order = List[Int]()
+
+    def findBackEdge(v: Int, e: Edge): Boolean = {
+      assert(vertexState(e.vertex) != Discovered, "Cycle exists in graph: vertex "+v+" edge "+e)
+      true
+    }
+
+    def pushVertex(v: Int): Boolean = {
+      order = v :: order
+      true
+    }
+
+    (0 until g.vertexCount).foreach { i =>
+      if (vertexState(0) == UnDiscovered) {
+        _dfs(g, i, vertexState, parent, entry, exit)(processEdge = findBackEdge, vertexLate = pushVertex)
+      }
+    }
+
+    order
   }
 }

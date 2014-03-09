@@ -238,4 +238,34 @@ class GraphSuite extends FunSpec {
     }
   }
 
+  describe("topologicalSort") {
+    it("should assert for an undirected graph") {
+      val g = Graph(5, List((0,1), (0,2), (1,3), (2,3), (3,4)))
+
+      intercept[AssertionError] {
+        Graph.topologicalSort(g)
+      }
+    }
+
+    it ("should assert if graph is not a DAG") {
+      // 0 -> 1 -> 2
+      //  \       /
+      //   -<----
+      val g = Graph(3, List((0,1), (1,2), (2,0)), directed = true)
+
+      intercept[AssertionError] {
+        Graph.topologicalSort(g)
+      }
+    }
+
+    it ("should return an ordering for a DAG") {
+      // 0 ->  1 -> 2
+      //  \        /
+      //   -> 3 ->-
+      val g = Graph(4, List((0,1), (1,2), (0,3), (3,2)), directed = true)
+
+      val order = Graph.topologicalSort(g)
+      assert(order == List(0,1,3,2) || order == List(0,3,1,2))
+    }
+  }
 }
