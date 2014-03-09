@@ -266,7 +266,7 @@ object Graph {
     }
 
     (0 until g.vertexCount).foreach { i =>
-      if (vertexState(0) == UnDiscovered) {
+      if (vertexState(i) == UnDiscovered) {
         _dfs(g, i, vertexState, parent, entry, exit)(processEdge = findBackEdge, vertexLate = pushVertex)
       }
     }
