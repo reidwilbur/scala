@@ -1,3 +1,4 @@
+package fpinscala.gettingstarted
 
 object CH2 {
 
@@ -65,17 +66,5 @@ object CH2 {
     (a) => f(g(a))
   }
 
-  def main(args: Array[String]): Unit = {
-    println(formatResult("abs", -42, abs))
-    println(formatResult("fib", 7, fib))
-
-    def gt[T <: Int](a: T, b: T): Boolean = {
-      a > b
-    }
-
-    println(isSorted(Array(1), gt))
-    println(isSorted(Array(1, 2, 0), gt))
-    println(isSorted(Array(1, 2, 3), gt))
-  }
 }
 
