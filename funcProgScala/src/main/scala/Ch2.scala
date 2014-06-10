@@ -32,9 +32,28 @@ object CH2 {
     msg.format(name, n, f(n))
   }
 
+  def isSorted[A](as: Array[A], gt: (A,A) => Boolean): Boolean = {
+    def go(idx: Int): Boolean = {
+      if (idx + 1 >= as.length) true
+      else {
+        if (gt(as(idx), as(idx+1))) false
+        else go(idx+1)
+      }
+    }
+    go(0)
+  }
+
   def main(args: Array[String]): Unit = {
     println(formatResult("abs", -42, abs))
     println(formatResult("fib", 7, fib))
+
+    def gt[T <: Int](a: T, b: T): Boolean = {
+      a > b
+    }
+
+    println(isSorted(Array(1), gt))
+    println(isSorted(Array(1, 2, 0), gt))
+    println(isSorted(Array(1, 2, 3), gt))
   }
 }
 
