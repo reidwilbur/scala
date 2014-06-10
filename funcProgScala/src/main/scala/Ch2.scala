@@ -43,6 +43,28 @@ object CH2 {
     go(0)
   }
 
+  def findFirst[A](as: Array[A], p: A => Boolean): Int = {
+    @annotation.tailrec
+    def loop(n: Int): Int = 
+      if (n >= as.length) -1
+      else if (p(as(n))) n
+      else loop(n+1)
+
+    loop(0)
+  }
+
+  def curry[A,B,C](f: (A,B) => C): A => (B => C) = {
+    (a) => (b) => f(a,b)
+  }
+
+  def uncurry[A,B,C](f: A => B => C): (A, B) => C = {
+    (a, b) => f(a)(b)
+  }
+
+  def compose[A,B,C](f: B => C, g: A => B) : A => C = {
+    (a) => f(g(a))
+  }
+
   def main(args: Array[String]): Unit = {
     println(formatResult("abs", -42, abs))
     println(formatResult("fib", 7, fib))
