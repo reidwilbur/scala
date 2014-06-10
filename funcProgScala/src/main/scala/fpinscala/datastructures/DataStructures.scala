@@ -79,4 +79,31 @@ object List { // `List` companion object. Contains functions for creating and wo
     }
     itr(l, Nil)
   }
+
+  def length[A](l: List[A]): Int = 
+    foldRight(l, 0)((x: A, len: Int) => len+1)
+
+  def foldLeft[A,B](l: List[A], z: B)(f: (B, A) => B): B = 
+    l match {
+      case Nil => z
+      case Cons(x, xs) => foldLeft(xs, f(z, x))(f)
+    }
+
+  def sumFoldLeft(ns: List[Int]): Int = 
+    foldLeft(ns, 0)( (z, x) => z + x )
+
+  def prodFoldLeft(ns: List[Double]): Double = 
+    foldLeft(ns, 1.0)( (z, x) => z * x )
+
+  def lengthFoldLeft[A](l: List[A]): Int = 
+    foldLeft(l, 0)( (z, x) => z + 1 )
+
+  def reverse[A](l: List[A]): List[A] = 
+    foldLeft(l, Nil: List[A])( (z, xs) => Cons(xs, z) )
+
+//  def foldRightWithFoldLeft[A,B](l: List[A], z: B)(f: (A,B) => B): B = 
+//    foldLeft(l, z)(
+
+//  def appendWithFold[A](l: List[A], x: A): List[A] = 
+//    foldRight(l, Nil: List[A])( (x, nxs) => Cons(x, nxs) )
 }

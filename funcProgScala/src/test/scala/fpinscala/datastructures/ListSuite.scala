@@ -63,4 +63,54 @@ class ListSuite extends FunSuite {
 
     assert(Nil == List.init(Nil))
   }
+
+  test("foldright nil and cons") {
+    println(List.foldRight(List(1,2,3), Nil:List[Int])(Cons(_, _)))
+  }
+
+  test("List.length returns length of list") {
+    val l1 = List(1,2,3,4)
+
+    assert(4 == List.length(l1))
+
+    assert(0 == List.length(Nil))
+  }
+
+  test("List.foldLeft returns correct value") {
+    val l1 = List(1,2,3,4)
+
+    assert(10 == List.foldLeft(l1, 0)( (z, x) => z + x ) )
+  }
+
+  test("List.sumFoldLeft returns correct value") {
+    val l1 = List(1,2,3,4)
+
+    assert(10 == List.sumFoldLeft(l1))
+    
+    assert(0 == List.sumFoldLeft(Nil))
+  }
+
+  test("List.prodFoldLeft returns correct value") {
+    val l1 = List(1.0, 2.0, 3.0, 4.0)
+
+    assert(24.0 == List.prodFoldLeft(l1))
+    
+    assert(1.0 == List.prodFoldLeft(Nil))
+  }
+
+  test("List.lengthFoldLeft returns correct value") {
+    val l1 = List(1.0, 2.0, 3.0, 4.0)
+
+    assert(4 == List.lengthFoldLeft(l1))
+    
+    assert(0 == List.lengthFoldLeft(Nil))
+  }
+
+  test("List.reverse returns correct value") {
+    val l1 = List(1, 2, 3, 4)
+
+    assert(List(4, 3, 2, 1) == List.reverse(l1))
+    
+    assert(Nil == List.reverse(Nil))
+  }
 }
