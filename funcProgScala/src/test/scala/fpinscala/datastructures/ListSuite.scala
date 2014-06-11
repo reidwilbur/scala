@@ -113,4 +113,28 @@ class ListSuite extends FunSuite {
     
     assert(Nil == List.reverse(Nil))
   }
+
+  test("List.appendWithFoldRight returns correct value") {
+    val l1 = List(1, 2, 3, 4)
+
+    assert(List(1,2,3,4,0) == List.appendWithFoldRight(l1, List(0)))
+    
+  }
+  
+  test("List.foldRightWithFoldLeft implements fold right") {
+    val l1 = List(1,2,3,4)
+
+    val s1 = List.foldRightWithFoldLeft(l1, 0){ (x, z) => z - x }
+    val s2 = List.foldRight(l1, 0){ (x, z) => z - x}
+
+    assert(s1 == s2)
+  }
+  
+  test("List.coalesce returns correct value") {
+    val ll = List(List(1,2,3), List(3,4,5), List(0))
+
+    val lc = List.coalesce(ll)
+
+    assert(List(1,2,3,3,4,5,0) == lc)
+  }
 }
