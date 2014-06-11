@@ -137,4 +137,52 @@ class ListSuite extends FunSuite {
 
     assert(List(1,2,3,3,4,5,0) == lc)
   }
+  
+  test("List.add1 returns correct value") {
+    val l = List(1,2,3,4)
+
+    assert(List(2,3,4,5) == List.add1(l))
+    assert(List(1,2,3,4) == l)
+  }
+  
+  test("List.doublesToString returns correct value") {
+    val l = List(1.0, 2.0, 3.0, 4.0)
+
+    assert(List("1.0", "2.0", "3.0", "4.0") == List.doublesToStrings(l))
+  }
+  
+  test("List.map returns correct value") {
+    val l = List(1.0, 2.0, 3.0, 4.0)
+
+    assert(List("1.0", "2.0", "3.0", "4.0") == List.map(l)(_.toString))
+  }
+  
+  test("List.filter returns correct value") {
+    val l = List(1, 2, 3, 4, 6, 7, 9, 10)
+
+    assert(List(2,4,6,10) == List.filter(l)(_ % 2 == 0))
+  }
+  
+  test("List.flatMap returns correct value") {
+    val l = List(1, 2, 3, 4)
+
+    assert(List(1,1,2,2,3,3,4,4) == List.flatMap(l)(x => List(x,x)))
+  }
+  
+  test("List.filterViaFlatMap returns correct value") {
+    val l = List(1, 2, 3, 4, 6, 7, 9, 10)
+
+    assert(List(2,4,6,10) == List.filterViaFlatMap(l)(_ % 2 == 0))
+  }
+
+  test("List.sumLists returns correct value") {
+    val l1 = List(1, 2, 3)
+    val l2 = List(4, 5, 6)
+
+    assert(List(5,7,9) == List.sumLists(l1,l2))
+
+    val l3 = List(4,5,6,7,8,9)
+
+    assert(List(5,7,9,7,8,9) == List.sumLists(l1,l3))
+  }
 }

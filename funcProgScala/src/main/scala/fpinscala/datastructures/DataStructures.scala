@@ -112,5 +112,34 @@ object List { // `List` companion object. Contains functions for creating and wo
       (acc, l) =>
         append(acc, l)
     }
+   
+  def add1(l: List[Int]): List[Int] = 
+    foldRight(l, Nil: List[Int])((x, acc) => Cons(x+1,acc))
+
+  def doublesToStrings(l: List[Double]): List[String] = 
+    foldRight(l, Nil: List[String])((d, acc) => Cons(d.toString, acc))
+
+  def map[A,B](l: List[A])(f: (A) => B): List[B] = 
+    //foldRight(l, Nil: List[B]){ (a, acc) => Cons(f(a), acc) }
+    foldRightWithFoldLeft(l, Nil: List[B]){ (a, acc) => Cons(f(a), acc) }
+
+  def filter[A](l: List[A])(f: (A) => Boolean): List[A] = 
+    foldRightWithFoldLeft(l, Nil: List[A]){ (a, acc) => if (f(a)) Cons(a, acc) else acc }
+
+  def flatMap[A,B](l: List[A])(f: (A) => List[B]): List[B] = 
+    coalesce(map(l)(f))
+
+  def filterViaFlatMap[A](l: List[A])(f: (A) => Boolean): List[A] =
+    flatMap(l)(x => if (f(x)) List(x) else Nil)
+
+  def sumLists(l: List[Int], r: List[Int]): List[Int] = {
+    def go(ll: List[Int], rr: List[Int], s: List[Int]): List[Int] = 
+      (ll, rr) match {
+        case (Nil, _) => append(reverse(s), rr)
+        case (_, Nil) => append(reverse(s), ll)
+        case (Cons(lh, lt), Cons(rh, rt)) => go(lt, rt, Cons(lh+rh, s))
+      }
+    go(l, r, Nil)
+  }
     
 }
