@@ -141,5 +141,29 @@ object List { // `List` companion object. Contains functions for creating and wo
       }
     go(l, r, Nil)
   }
-    
+   
+  def pairwise[A,B,C](l: List[A], r: List[B])(f: (A,B) => C): List[C] = {
+    def go(ll: List[A], rr: List[B], s: List[C]): List[C] = 
+      (ll, rr) match {
+        case (Nil, _) => reverse(s)
+        case (_, Nil) => reverse(s)
+        case (Cons(lh, lt), Cons(rh, rt)) => go(lt, rt, Cons(f(lh,rh), s))
+      }
+    go(l, r, Nil)
+  }
+
+  def hasSubseq[A](l: List[A], seq: List[A]): Boolean = {
+    def go(ll: List[A], sseq: List[A]): Boolean = {
+      (ll, sseq) match {
+        case (Nil, Nil) => true
+        case (_, Nil)   => true
+        case (Nil, _)   => false
+        case (Cons(lh, lt), Cons(sh, st)) => 
+          if (lh == sh) go(lt, st)
+          else go(lt, seq)
+      }
+    }
+    go(l, seq)
+  }
+
 }

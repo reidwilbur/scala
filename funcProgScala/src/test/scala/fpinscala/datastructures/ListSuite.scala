@@ -185,4 +185,35 @@ class ListSuite extends FunSuite {
 
     assert(List(5,7,9,7,8,9) == List.sumLists(l1,l3))
   }
+
+  test("List.pairwise returns correct value") {
+    val l1 = List(1, 2, 3)
+    val l2 = List(4, 5, 6)
+
+    assert(List(5,7,9) == List.pairwise(l1,l2)((l,r) => l + r))
+
+    val l3 = List(4,5,6,7,8,9)
+
+    assert(List(5,7,9) == List.pairwise(l1,l3)((l,r) => l + r))
+  }
+
+  test("List.hasSubseq returns correct value") {
+    val l1 = List(1,2,3,4,5,6)
+
+    assert(true == List.hasSubseq(l1, Nil))
+
+    assert(true == List.hasSubseq(l1, List(1)))
+    assert(true == List.hasSubseq(l1, List(6)))
+
+    assert(false == List.hasSubseq(l1, List(-1)))
+    assert(false == List.hasSubseq(l1, List(7)))
+
+    assert(true == List.hasSubseq(l1, List(1,2,3)))
+    assert(true == List.hasSubseq(l1, List(4,5,6)))
+    assert(true == List.hasSubseq(l1, List(3,4,5)))
+
+    assert(false == List.hasSubseq(l1, List(1,2,4)))
+    assert(false == List.hasSubseq(l1, List(4,5,7)))
+    assert(false == List.hasSubseq(l1, List(3,4,6)))
+  }
 }
