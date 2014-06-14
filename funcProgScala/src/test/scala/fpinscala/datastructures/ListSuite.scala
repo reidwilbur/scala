@@ -6,214 +6,214 @@ import org.junit.runner.RunWith
 
 @RunWith(classOf[JUnitRunner])
 class ListSuite extends FunSuite {
-  test("List.tail returns the tail of the list") {
-    val l = fpinscala.datastructures.List(1, 2, 3, 4);
+  test("LList.tail returns the tail of the list") {
+    val l = LList(1, 2, 3, 4);
 
-    assert(fpinscala.datastructures.List(2, 3, 4) == fpinscala.datastructures.List.tail(l))
+    assert(LList(2, 3, 4) == LList.tail(l))
   }
 
-  test("List.tail returns Nil for empty list") {
-    val l = fpinscala.datastructures.List();
+  test("LList.tail returns NNil for empty list") {
+    val l = LList();
 
-    assert(fpinscala.datastructures.Nil == fpinscala.datastructures.List.tail(l))
+    assert(NNil == LList.tail(l))
   }
 
-  test("List.setHead returns list with updated head") {
-    val l1 = fpinscala.datastructures.List(1, 2, 3)
+  test("LList.setHead returns list with updated head") {
+    val l1 = LList(1, 2, 3)
 
-    val l2 = fpinscala.datastructures.List.setHead(33, l1)
+    val l2 = LList.setHead(33, l1)
 
-    assert(fpinscala.datastructures.List(33, 2, 3) == l2)
+    assert(LList(33, 2, 3) == l2)
 
-    val l3 = fpinscala.datastructures.List.setHead(33, fpinscala.datastructures.Nil)
+    val l3 = LList.setHead(33, NNil)
 
-    assert(fpinscala.datastructures.List(33) == l3)
+    assert(LList(33) == l3)
   }
 
-  test("List.drop drops first n items from list") {
-    val l1 = List(1, 2, 3, 4, 5, 6)
+  test("LList.drop drops first n items from list") {
+    val l1 = LList(1, 2, 3, 4, 5, 6)
 
-    val l2 = List.drop(l1, 2)
+    val l2 = LList.drop(l1, 2)
 
-    assert(List(3, 4, 5, 6) == l2)
+    assert(LList(3, 4, 5, 6) == l2)
 
-    assert(Nil == List.drop(l1, 35))
+    assert(NNil == LList.drop(l1, 35))
 
-    assert(l1 == List.drop(l1, 0))
+    assert(l1 == LList.drop(l1, 0))
   }
 
-  test("List.dropWhile drops first items while condition is true") {
-    val l1 = List(1, 2, 3, 4, 5, 6)
+  test("LList.dropWhile drops first items while condition is true") {
+    val l1 = LList(1, 2, 3, 4, 5, 6)
 
-    val l2 = List.dropWhile(l1){ _ < 4 }
+    val l2 = LList.dropWhile(l1){ _ < 4 }
 
-    assert(List(4, 5, 6) == l2)
+    assert(LList(4, 5, 6) == l2)
 
-    assert(Nil == List.dropWhile(l1){ _ != 100 })
+    assert(NNil == LList.dropWhile(l1){ _ != 100 })
 
-    assert(l1 == List.dropWhile(l1){ _ < 0 })
+    assert(l1 == LList.dropWhile(l1){ _ < 0 })
   }
 
-  test("List.init returns all but last element") {
-    val l1 = List(1, 2, 3, 4, 5)
+  test("LList.init returns all but last element") {
+    val l1 = LList(1, 2, 3, 4, 5)
 
-    assert(List(1,2,3,4) == List.init(l1))
+    assert(LList(1,2,3,4) == LList.init(l1))
 
-    assert(Nil == List.init(List(1)))
+    assert(NNil == LList.init(LList(1)))
 
-    assert(Nil == List.init(Nil))
+    assert(NNil == LList.init(NNil))
   }
 
   test("foldright nil and cons") {
-    println(List.foldRight(List(1,2,3), Nil:List[Int])(Cons(_, _)))
+    println(LList.foldRight(LList(1,2,3), NNil:LList[Int])(CCons(_, _)))
   }
 
-  test("List.length returns length of list") {
-    val l1 = List(1,2,3,4)
+  test("LList.length returns length of list") {
+    val l1 = LList(1,2,3,4)
 
-    assert(4 == List.length(l1))
+    assert(4 == LList.length(l1))
 
-    assert(0 == List.length(Nil))
+    assert(0 == LList.length(NNil))
   }
 
-  test("List.foldLeft returns correct value") {
-    val l1 = List(1,2,3,4)
+  test("LList.foldLeft returns correct value") {
+    val l1 = LList(1,2,3,4)
 
-    assert(10 == List.foldLeft(l1, 0)( (z, x) => z + x ) )
+    assert(10 == LList.foldLeft(l1, 0)( (z, x) => z + x ) )
   }
 
-  test("List.sumFoldLeft returns correct value") {
-    val l1 = List(1,2,3,4)
+  test("LList.sumFoldLeft returns correct value") {
+    val l1 = LList(1,2,3,4)
 
-    assert(10 == List.sumFoldLeft(l1))
+    assert(10 == LList.sumFoldLeft(l1))
     
-    assert(0 == List.sumFoldLeft(Nil))
+    assert(0 == LList.sumFoldLeft(NNil))
   }
 
-  test("List.prodFoldLeft returns correct value") {
-    val l1 = List(1.0, 2.0, 3.0, 4.0)
+  test("LList.prodFoldLeft returns correct value") {
+    val l1 = LList(1.0, 2.0, 3.0, 4.0)
 
-    assert(24.0 == List.prodFoldLeft(l1))
+    assert(24.0 == LList.prodFoldLeft(l1))
     
-    assert(1.0 == List.prodFoldLeft(Nil))
+    assert(1.0 == LList.prodFoldLeft(NNil))
   }
 
-  test("List.lengthFoldLeft returns correct value") {
-    val l1 = List(1.0, 2.0, 3.0, 4.0)
+  test("LList.lengthFoldLeft returns correct value") {
+    val l1 = LList(1.0, 2.0, 3.0, 4.0)
 
-    assert(4 == List.lengthFoldLeft(l1))
+    assert(4 == LList.lengthFoldLeft(l1))
     
-    assert(0 == List.lengthFoldLeft(Nil))
+    assert(0 == LList.lengthFoldLeft(NNil))
   }
 
-  test("List.reverse returns correct value") {
-    val l1 = List(1, 2, 3, 4)
+  test("LList.reverse returns correct value") {
+    val l1 = LList(1, 2, 3, 4)
 
-    assert(List(4, 3, 2, 1) == List.reverse(l1))
+    assert(LList(4, 3, 2, 1) == LList.reverse(l1))
     
-    assert(Nil == List.reverse(Nil))
+    assert(NNil == LList.reverse(NNil))
   }
 
-  test("List.appendWithFoldRight returns correct value") {
-    val l1 = List(1, 2, 3, 4)
+  test("LList.appendWithFoldRight returns correct value") {
+    val l1 = LList(1, 2, 3, 4)
 
-    assert(List(1,2,3,4,0) == List.appendWithFoldRight(l1, List(0)))
+    assert(LList(1,2,3,4,0) == LList.appendWithFoldRight(l1, LList(0)))
     
   }
   
-  test("List.foldRightWithFoldLeft implements fold right") {
-    val l1 = List(1,2,3,4)
+  test("LList.foldRightWithFoldLeft implements fold right") {
+    val l1 = LList(1,2,3,4)
 
-    val s1 = List.foldRightWithFoldLeft(l1, 0){ (x, z) => z - x }
-    val s2 = List.foldRight(l1, 0){ (x, z) => z - x}
+    val s1 = LList.foldRightWithFoldLeft(l1, 0){ (x, z) => z - x }
+    val s2 = LList.foldRight(l1, 0){ (x, z) => z - x}
 
     assert(s1 == s2)
   }
   
-  test("List.coalesce returns correct value") {
-    val ll = List(List(1,2,3), List(3,4,5), List(0))
+  test("LList.coalesce returns correct value") {
+    val ll = LList(LList(1,2,3), LList(3,4,5), LList(0))
 
-    val lc = List.coalesce(ll)
+    val lc = LList.coalesce(ll)
 
-    assert(List(1,2,3,3,4,5,0) == lc)
+    assert(LList(1,2,3,3,4,5,0) == lc)
   }
   
-  test("List.add1 returns correct value") {
-    val l = List(1,2,3,4)
+  test("LList.add1 returns correct value") {
+    val l = LList(1,2,3,4)
 
-    assert(List(2,3,4,5) == List.add1(l))
-    assert(List(1,2,3,4) == l)
+    assert(LList(2,3,4,5) == LList.add1(l))
+    assert(LList(1,2,3,4) == l)
   }
   
-  test("List.doublesToString returns correct value") {
-    val l = List(1.0, 2.0, 3.0, 4.0)
+  test("LList.doublesToString returns correct value") {
+    val l = LList(1.0, 2.0, 3.0, 4.0)
 
-    assert(List("1.0", "2.0", "3.0", "4.0") == List.doublesToStrings(l))
+    assert(LList("1.0", "2.0", "3.0", "4.0") == LList.doublesToStrings(l))
   }
   
-  test("List.map returns correct value") {
-    val l = List(1.0, 2.0, 3.0, 4.0)
+  test("LList.map returns correct value") {
+    val l = LList(1.0, 2.0, 3.0, 4.0)
 
-    assert(List("1.0", "2.0", "3.0", "4.0") == List.map(l)(_.toString))
+    assert(LList("1.0", "2.0", "3.0", "4.0") == LList.map(l)(_.toString))
   }
   
-  test("List.filter returns correct value") {
-    val l = List(1, 2, 3, 4, 6, 7, 9, 10)
+  test("LList.filter returns correct value") {
+    val l = LList(1, 2, 3, 4, 6, 7, 9, 10)
 
-    assert(List(2,4,6,10) == List.filter(l)(_ % 2 == 0))
+    assert(LList(2,4,6,10) == LList.filter(l)(_ % 2 == 0))
   }
   
-  test("List.flatMap returns correct value") {
-    val l = List(1, 2, 3, 4)
+  test("LList.flatMap returns correct value") {
+    val l = LList(1, 2, 3, 4)
 
-    assert(List(1,1,2,2,3,3,4,4) == List.flatMap(l)(x => List(x,x)))
+    assert(LList(1,1,2,2,3,3,4,4) == LList.flatMap(l)(x => LList(x,x)))
   }
   
-  test("List.filterViaFlatMap returns correct value") {
-    val l = List(1, 2, 3, 4, 6, 7, 9, 10)
+  test("LList.filterViaFlatMap returns correct value") {
+    val l = LList(1, 2, 3, 4, 6, 7, 9, 10)
 
-    assert(List(2,4,6,10) == List.filterViaFlatMap(l)(_ % 2 == 0))
+    assert(LList(2,4,6,10) == LList.filterViaFlatMap(l)(_ % 2 == 0))
   }
 
-  test("List.sumLists returns correct value") {
-    val l1 = List(1, 2, 3)
-    val l2 = List(4, 5, 6)
+  test("LList.sumLists returns correct value") {
+    val l1 = LList(1, 2, 3)
+    val l2 = LList(4, 5, 6)
 
-    assert(List(5,7,9) == List.sumLists(l1,l2))
+    assert(LList(5,7,9) == LList.sumLists(l1,l2))
 
-    val l3 = List(4,5,6,7,8,9)
+    val l3 = LList(4,5,6,7,8,9)
 
-    assert(List(5,7,9,7,8,9) == List.sumLists(l1,l3))
+    assert(LList(5,7,9,7,8,9) == LList.sumLists(l1,l3))
   }
 
-  test("List.pairwise returns correct value") {
-    val l1 = List(1, 2, 3)
-    val l2 = List(4, 5, 6)
+  test("LList.pairwise returns correct value") {
+    val l1 = LList(1, 2, 3)
+    val l2 = LList(4, 5, 6)
 
-    assert(List(5,7,9) == List.pairwise(l1,l2)((l,r) => l + r))
+    assert(LList(5,7,9) == LList.pairwise(l1,l2)((l,r) => l + r))
 
-    val l3 = List(4,5,6,7,8,9)
+    val l3 = LList(4,5,6,7,8,9)
 
-    assert(List(5,7,9) == List.pairwise(l1,l3)((l,r) => l + r))
+    assert(LList(5,7,9) == LList.pairwise(l1,l3)((l,r) => l + r))
   }
 
-  test("List.hasSubseq returns correct value") {
-    val l1 = List(1,2,3,4,5,6)
+  test("LList.hasSubseq returns correct value") {
+    val l1 = LList(1,2,3,4,5,6)
 
-    assert(true == List.hasSubseq(l1, Nil))
+    assert(true == LList.hasSubseq(l1, NNil))
 
-    assert(true == List.hasSubseq(l1, List(1)))
-    assert(true == List.hasSubseq(l1, List(6)))
+    assert(true == LList.hasSubseq(l1, LList(1)))
+    assert(true == LList.hasSubseq(l1, LList(6)))
 
-    assert(false == List.hasSubseq(l1, List(-1)))
-    assert(false == List.hasSubseq(l1, List(7)))
+    assert(false == LList.hasSubseq(l1, LList(-1)))
+    assert(false == LList.hasSubseq(l1, LList(7)))
 
-    assert(true == List.hasSubseq(l1, List(1,2,3)))
-    assert(true == List.hasSubseq(l1, List(4,5,6)))
-    assert(true == List.hasSubseq(l1, List(3,4,5)))
+    assert(true == LList.hasSubseq(l1, LList(1,2,3)))
+    assert(true == LList.hasSubseq(l1, LList(4,5,6)))
+    assert(true == LList.hasSubseq(l1, LList(3,4,5)))
 
-    assert(false == List.hasSubseq(l1, List(1,2,4)))
-    assert(false == List.hasSubseq(l1, List(4,5,7)))
-    assert(false == List.hasSubseq(l1, List(3,4,6)))
+    assert(false == LList.hasSubseq(l1, LList(1,2,4)))
+    assert(false == LList.hasSubseq(l1, LList(4,5,7)))
+    assert(false == LList.hasSubseq(l1, LList(3,4,6)))
   }
 }
