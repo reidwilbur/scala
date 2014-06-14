@@ -22,6 +22,8 @@ sealed trait OOption[+A] {
 
   def filter(f: A => Boolean): OOption[A] = 
     flatMap(a => if (f(a)) SSome(a) else NNone)
+
+  def lift[A,B](f: A => B): Option[A] => Option[B] = _ map f
 }
 case class SSome[+A](get: A) extends OOption[A]
 case object NNone extends OOption[Nothing]
@@ -48,4 +50,25 @@ object OOption {
   def mean(xs: Seq[Double]): OOption[Double] =
     if (xs.isEmpty) NNone
     else SSome(xs.sum / xs.length)
+
+  def variance(xs: Seq[Double]): OOption[Double] = {
+    mean(xs).flatMap(m => mean(xs.map(x => math.pow((x - m),2))) )
+  }
+
+  def map2[A,B,C](a: OOption[A], b: OOption[B])(f: (A, B) => C): OOption[C] =
+    a.flatMap(aa => b.map(bb => f(aa,bb)))
+
+  def sequence[A](a: List[OOption[A]]): OOption[List[A]] = 
+    //a.foldRight(SSome[List[A]](Nil): OOption[List[A]])
+    //  { (aa, l) => map2(aa,l)(_ :: _) }
+    traverse(a)(oa => oa.map(av => av))
+
+  def Try[A](a: => A): OOption[A] = 
+    try SSome(a)
+    catch { case e: Exception => NNone }
+
+  def traverse[A,B](a: List[A])(f: A => OOption[B]): OOption[List[B]] = 
+    a.foldRight(SSome[List[B]](Nil): OOption[List[B]])
+     { (aa, olb) => map2(f(aa), olb)(_ :: _) }
 }
+
