@@ -34,4 +34,18 @@ class EitherSuite extends FunSuite {
     assert(LLeft("boof") == RRight(1).map2(LLeft("boof"))(f))
     assert(LLeft("boof") == LLeft("boof").map2(RRight(2.0))(f))
   }
+
+  test("7 EEither.sequence returns correct value") {
+    assert(RRight(List()) == EEither.sequence(List()))
+    assert(RRight(List(1, 2, 3)) == EEither.sequence(List(RRight(1), RRight(2), RRight(3))))
+    assert(LLeft("boof") == EEither.sequence(List(RRight(1), LLeft("boof"), RRight(3))))
+    assert(LLeft("boof") == EEither.sequence(List(RRight(1), LLeft("boof"), LLeft("foob"))))
+  }
+
+  test("7 EEither.traverse returns correct value") {
+    assert(RRight(List()) == EEither.traverse(List()){e => e})
+    assert(RRight(List(1, 2, 3)) == EEither.traverse(List(RRight(1), RRight(2), RRight(3))){e=>e})
+    assert(LLeft("boof") == EEither.traverse(List(RRight(1), LLeft("boof"), RRight(3))){e=>e})
+    assert(LLeft("boof") == EEither.traverse(List(RRight(1), LLeft("boof"), LLeft("foob"))){e=>e})
+  }
 }
