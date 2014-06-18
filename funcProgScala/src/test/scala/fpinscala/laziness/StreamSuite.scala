@@ -29,4 +29,12 @@ class StreamSuite extends FunSuite {
     assert(Nil == Stream(1,2,3).drop(3).toList)
     assert(Nil == Stream(1,2,3).drop(4).toList)
   }
+
+  test("3 Stream.takeWhile returns correct value") {
+    assert(Stream.empty == Stream().takeWhile(_ => true))
+    assert(Stream.empty == Stream().takeWhile(_ => false))
+    assert(List(1,2,3) == Stream(1,2,3).takeWhile(_ => true).toList)
+    assert(List(1,2) == Stream(1,2,3).takeWhile(_ < 3).toList)
+    assert(Nil == Stream(1,2,3).takeWhile(_ => false).toList)
+  }
 }

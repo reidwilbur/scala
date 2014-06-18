@@ -36,6 +36,12 @@ sealed abstract class Stream[+A] { // The abstract base class for streams. It wi
 
     dropRec(this, n)
   }
+
+  def takeWhile(f: A => Boolean): Stream[A] = 
+    this match {
+      case c: Cons[_] if f(c.head) => Stream.cons(c.head, c.tail.takeWhile(f))
+      case _ => Stream.empty
+    }
 }
 
 object Empty extends Stream[Nothing] {
