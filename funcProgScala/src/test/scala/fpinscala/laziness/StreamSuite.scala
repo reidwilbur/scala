@@ -37,4 +37,12 @@ class StreamSuite extends FunSuite {
     assert(List(1,2) == Stream(1,2,3).takeWhile(_ < 3).toList)
     assert(Nil == Stream(1,2,3).takeWhile(_ => false).toList)
   }
+
+  test("4 Stream.forAll returns correct value") {
+    assert(true == Stream[Int]().forAll(_ > 0))
+    assert(true == Stream[Int](1).forAll(_ > 0))
+    assert(false == Stream[Int](0).forAll(_ > 0))
+    assert(false== Stream[Int](1,2,3,0).forAll(_ > 0))
+    assert(false== Stream[Int](0,1,2,3).forAll(_ > 0))
+  }
 }

@@ -38,10 +38,15 @@ sealed abstract class Stream[+A] { // The abstract base class for streams. It wi
   }
 
   def takeWhile(f: A => Boolean): Stream[A] = 
-    this match {
-      case c: Cons[_] if f(c.head) => Stream.cons(c.head, c.tail.takeWhile(f))
-      case _ => Stream.empty
-    }
+    //this match {
+    //  case c: Cons[_] if f(c.head) => Stream.cons(c.head, c.tail.takeWhile(f))
+    //  case _ => Stream.empty
+    //}
+    foldRight(Stream.empty: Stream[A]){ (a, sa) => if (f(a)) Stream.cons(a, sa) else Stream.empty }
+
+  def forAll(p: A => Boolean): Boolean = 
+    foldRight(true){ (a, b) => p(a) && b }
+
 }
 
 object Empty extends Stream[Nothing] {
