@@ -96,4 +96,13 @@ class StreamSuite extends FunSuite {
   test("11 Stream.unfold returns correct value") {
     assert(List(1,2,3,4,5) == Stream.unfold(1)( i => Some(i,i+1) ).take(5).toList)
   }
+
+  test("13 Stream.zipWith returns correct value") {
+    val s1 = Stream(1,2,3)
+    val s2 = Stream("foo", "bar", "baz")
+
+    assert(List((1,"foo"),(2,"bar"),(3,"baz")) == s1.zipWith(s2).toList)
+    assert(Nil == Stream().zipWith(s2).toList)
+    assert(List((1,"foo")) == Stream(1).zipWith(s2).toList)
+  }
 }

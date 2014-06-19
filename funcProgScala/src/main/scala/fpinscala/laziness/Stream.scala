@@ -18,11 +18,15 @@ sealed abstract class Stream[+A] { // The abstract base class for streams. It wi
     foldRight(Nil: List[A]){ (a, la) => a :: la }
 
   def take(n: Int): Stream[A] = 
-    if (n > 0) this match {
-      case c: Cons[_] => Stream.cons(c.head, c.tail.take(n-1))
-      case _ => Stream.empty
-    }
-    else Stream.empty
+    //if (n > 0) this match {
+    //  case c: Cons[_] => Stream.cons(c.head, c.tail.take(n-1))
+    //  case _ => Stream.empty
+    //}
+    //else Stream.empty
+    Stream.unfold((this,n)){ s => s match {
+      case (c: Cons[_], nn) if nn > 0 => Some((c.head, (c.tail, nn-1)))
+      case _ => None
+    }}
 
   def drop(n: Int): Stream[A] = {
     @annotation.tailrec
@@ -42,7 +46,11 @@ sealed abstract class Stream[+A] { // The abstract base class for streams. It wi
     //  case c: Cons[_] if f(c.head) => Stream.cons(c.head, c.tail.takeWhile(f))
     //  case _ => Stream.empty
     //}
-    foldRight(Stream.empty: Stream[A]){ (a, sa) => if (f(a)) Stream.cons(a, sa) else Stream.empty }
+    //foldRight(Stream.empty: Stream[A]){ (a, sa) => if (f(a)) Stream.cons(a, sa) else Stream.empty }
+    unfold(this){ s => s match {
+      case (c: Cons[_]) if f(c.head) => Some((c.head, c.tail))
+      case _ => None
+    }}
 
   def forAll(p: A => Boolean): Boolean = 
     foldRight(true){ (a, b) => p(a) && b }
@@ -51,7 +59,11 @@ sealed abstract class Stream[+A] { // The abstract base class for streams. It wi
     foldRight(None: Option[A]){ (a, oa) => Some(a) }
 
   def map[B](f: A => B): Stream[B] = 
-    foldRight(Stream.empty: Stream[B]){ (a, lb) => Stream.cons(f(a), lb) }
+    //foldRight(Stream.empty: Stream[B]){ (a, lb) => Stream.cons(f(a), lb) }
+    Stream.unfold(this){ s => s match {
+      case c: Cons[_] => Some((f(c.head), c.tail))
+      case _ => None
+    }}
 
   def filter(f: A => Boolean): Stream[A] = 
     foldRight(Stream.empty: Stream[A]){ (a, sa) => if (f(a)) Stream.cons(a, sa) else sa }
@@ -64,6 +76,12 @@ sealed abstract class Stream[+A] { // The abstract base class for streams. It wi
 
   def find(f: A => Boolean): Option[A] =
     filter(f).headOption
+
+  def zipWith[B](other: Stream[B]): Stream[(A,B)] = 
+    unfold((this, other)){ s => s match {
+      case (t: Cons[_], o: Cons[_]) => Some( ( (t.head,o.head), (t.tail,o.tail) ) )
+      case _ => None
+    }}
 }
 
 object Empty extends Stream[Nothing] {
