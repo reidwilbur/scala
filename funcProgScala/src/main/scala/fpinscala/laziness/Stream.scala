@@ -77,11 +77,21 @@ sealed abstract class Stream[+A] { // The abstract base class for streams. It wi
   def find(f: A => Boolean): Option[A] =
     filter(f).headOption
 
-  def zipWith[B](other: Stream[B]): Stream[(A,B)] = 
+  def zipWith[B,C](other: Stream[B])(f: (A,B) => C): Stream[C] = 
     unfold((this, other)){ s => s match {
-      case (t: Cons[_], o: Cons[_]) => Some( ( (t.head,o.head), (t.tail,o.tail) ) )
+      case (t: Cons[_], o: Cons[_]) => Some( ( f(t.head,o.head), (t.tail,o.tail) ) )
       case _ => None
     }}
+
+  def zipAll[B](other: Stream[B]): Stream[(Option[A],Option[B])] =
+    unfold((this,other)){ s => s match {
+      case (Empty, Empty) => None
+      case (t, o) => Some( ( (t.headOption, o.headOption), (t.drop(1), o.drop(1)) ) )
+    }}
+
+  def startsWith[A](s: Stream[A]): Boolean = {
+    !zipWith(s)((a1,a2) => a1 == a2).exists(_ == false)
+  }
 }
 
 object Empty extends Stream[Nothing] {

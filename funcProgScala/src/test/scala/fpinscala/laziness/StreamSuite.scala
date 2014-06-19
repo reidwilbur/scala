@@ -101,8 +101,25 @@ class StreamSuite extends FunSuite {
     val s1 = Stream(1,2,3)
     val s2 = Stream("foo", "bar", "baz")
 
-    assert(List((1,"foo"),(2,"bar"),(3,"baz")) == s1.zipWith(s2).toList)
-    assert(Nil == Stream().zipWith(s2).toList)
-    assert(List((1,"foo")) == Stream(1).zipWith(s2).toList)
+    assert(List((1,"foo"),(2,"bar"),(3,"baz")) == s1.zipWith(s2)((_,_)).toList)
+    assert(Nil == Stream().zipWith(s2)((_,_)).toList)
+    assert(List((1,"foo")) == Stream(1).zipWith(s2)((_,_)).toList)
+  }
+
+  test("13 Stream.zipAll returns correct value") {
+    val s1 = Stream(1,2)
+    val s2 = Stream("foo", "bar", "baz")
+   
+    assert(List((Some(1),Some("foo")), (Some(2),Some("bar")), (None, Some("baz")))
+           == s1.zipAll(s2).toList)
+    
+    assert(List((None,Some("foo")), (None,Some("bar")), (None, Some("baz")))
+           == Stream().zipAll(s2).toList)
+  }
+
+  test("14 Stream.startsWith returns correct value") {
+    assert(Stream(1,2,3,4).startsWith(Stream(1,2)))
+    assert(Stream(1,2,3,4).startsWith(Stream()))
+    assert(!Stream(1,2,3,4).startsWith(Stream(1,2,4)))
   }
 }
