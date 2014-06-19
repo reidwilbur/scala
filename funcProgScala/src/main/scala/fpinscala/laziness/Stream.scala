@@ -61,6 +61,9 @@ sealed abstract class Stream[+A] { // The abstract base class for streams. It wi
 
   def flatMap[B](f: A => Stream[B]): Stream[B] =
     foldRight(Stream.empty: Stream[B]){ (a, sb) => f(a).append(sb) }
+
+  def find(f: A => Boolean): Option[A] =
+    filter(f).headOption
 }
 
 object Empty extends Stream[Nothing] {
@@ -85,5 +88,8 @@ object Stream {
       if (as.isEmpty) Empty else cons(as.head, apply(as.tail: _*))
 
   val ones: Stream[Int] = cons(1, ones)
+
+  def constant[A](a: => A): Stream[A] = 
+    cons(a, constant(a))
 }
 
