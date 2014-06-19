@@ -92,6 +92,13 @@ sealed abstract class Stream[+A] { // The abstract base class for streams. It wi
   def startsWith[A](s: Stream[A]): Boolean = {
     !zipWith(s)((a1,a2) => a1 == a2).exists(_ == false)
   }
+
+  def tails: Stream[Stream[A]] = 
+    unfold(Some(this): Option[Stream[A]]){ s => s match {
+      case Some(c: Cons[_]) => Some( (c, Some(c.tail)) )
+      case Some(Empty)      => Some( (Stream.empty, None) )
+      case _ => None
+    }}
 }
 
 object Empty extends Stream[Nothing] {

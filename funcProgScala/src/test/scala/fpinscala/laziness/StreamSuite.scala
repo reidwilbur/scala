@@ -122,4 +122,12 @@ class StreamSuite extends FunSuite {
     assert(Stream(1,2,3,4).startsWith(Stream()))
     assert(!Stream(1,2,3,4).startsWith(Stream(1,2,4)))
   }
+
+  test("15 Stream.tails returns correct value") {
+    val ts = Stream(1,2,3).tails.toList
+    assert(List(1,2,3) == ts.head.toList)
+    assert(List(2,3)   == ts.drop(1).head.toList)
+    assert(List(3)     == ts.drop(2).head.toList)
+    assert(Nil         == ts.drop(3).head.toList)
+  }
 }
