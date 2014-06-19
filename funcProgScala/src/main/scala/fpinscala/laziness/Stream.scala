@@ -47,6 +47,20 @@ sealed abstract class Stream[+A] { // The abstract base class for streams. It wi
   def forAll(p: A => Boolean): Boolean = 
     foldRight(true){ (a, b) => p(a) && b }
 
+  def headOption: Option[A] = 
+    foldRight(None: Option[A]){ (a, oa) => Some(a) }
+
+  def map[B](f: A => B): Stream[B] = 
+    foldRight(Stream.empty: Stream[B]){ (a, lb) => Stream.cons(f(a), lb) }
+
+  def filter(f: A => Boolean): Stream[A] = 
+    foldRight(Stream.empty: Stream[A]){ (a, sa) => if (f(a)) Stream.cons(a, sa) else sa }
+
+  def append[AA >: A](s: => Stream[AA]): Stream[AA] =
+    foldRight(s){ (a, sa) => Stream.cons(a, sa) }
+
+  def flatMap[B](f: A => Stream[B]): Stream[B] =
+    foldRight(Stream.empty: Stream[B]){ (a, sb) => f(a).append(sb) }
 }
 
 object Empty extends Stream[Nothing] {
