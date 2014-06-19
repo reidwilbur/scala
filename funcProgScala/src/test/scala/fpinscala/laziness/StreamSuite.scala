@@ -78,7 +78,14 @@ class StreamSuite extends FunSuite {
     assert(List(2,2,3,3,4,4) == Stream(1, 2, 3).flatMap{ i => Stream(i+1, i+1) }.toList)
   }
 
-  test("8 Stream.constant return correct value") {
+  test("8 Stream.constant returns correct value") {
     assert(List("foo", "foo", "foo") == Stream.constant("foo").take(3).toList)
+  }
+
+  test("9 Stream.from returns correct value") {
+    val from10 = Stream.from(10)
+
+    assert(List(10, 11, 12) == from10.take(3).toList)
+    assert(List(11, 13) == from10.take(5).filter(_ % 2 == 1).toList)
   }
 }
