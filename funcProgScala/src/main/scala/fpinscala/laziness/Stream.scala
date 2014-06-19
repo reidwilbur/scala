@@ -87,14 +87,34 @@ object Stream {
     def apply[A](as: A*): Stream[A] = // A convenient variable-argument method for constructing a `Stream` from multiple elements.
       if (as.isEmpty) Empty else cons(as.head, apply(as.tail: _*))
 
-  val ones: Stream[Int] = cons(1, ones)
+  //val ones: Stream[Int] = cons(1, ones)
+  def ones: Stream[Int] = 
+    unfold(1)(_ => Some(1,1))
 
-  def constant[A](a: => A): Stream[A] = {
-    lazy val tail: Stream[A] = cons(a, tail)
-    tail
-  }
+  def constant[A](a: => A): Stream[A] = 
+  //{
+  //  lazy val tail: Stream[A] = cons(a, tail)
+  //  tail
+  //}
+    unfold(a)(_ => Some(a,a))
 
   def from(n: Int): Stream[Int] = 
-    cons(n, from(n+1))
+  //  cons(n, from(n+1))
+    unfold(n)(n => Some(n, n+1))
+
+  val fibs: Stream[Int] = 
+  //{
+  //  def calcFibs(f1: Int, f2: Int): Stream[Int] = 
+  //    cons(f1, calcFibs(f2, f1+f2))
+  //  calcFibs(0,1)
+  //}
+    unfold((0,1))(s => Some((s._1, (s._2, s._1 + s._2))) )
+  
+  def unfold[A, S](z: S)(f: S => Option[(A,S)]): Stream[A] = 
+    //f(z).fold(Stream.empty: Stream[A])( a_s => cons(a_s._1, unfold(a_s._2)(f)) )
+    f(z) match {
+      case Some((a, s)) => cons(a, unfold(s)(f))
+      case _ => empty
+    }
 }
 

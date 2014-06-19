@@ -88,4 +88,12 @@ class StreamSuite extends FunSuite {
     assert(List(10, 11, 12) == from10.take(3).toList)
     assert(List(11, 13) == from10.take(5).filter(_ % 2 == 1).toList)
   }
+
+  test("10 Stream.fibs returns correct value") {
+    assert(List(0, 1, 1, 2, 3, 5, 8, 13, 21) == Stream.fibs.take(9).toList)
+  }
+
+  test("11 Stream.unfold returns correct value") {
+    assert(List(1,2,3,4,5) == Stream.unfold(1)( i => Some(i,i+1) ).take(5).toList)
+  }
 }
