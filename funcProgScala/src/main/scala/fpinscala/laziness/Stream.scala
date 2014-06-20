@@ -99,6 +99,13 @@ sealed abstract class Stream[+A] { // The abstract base class for streams. It wi
       case Some(Empty)      => Some( (Stream.empty, None) )
       case _ => None
     }}
+
+  def scanRight[B](z: => B)(f: (A, => B) => B): Stream[B] = 
+    //tails.map{ s => s.foldRight(z){ (a, b) => f(a,b) } }
+    foldRight((z, Stream(z))){ (a, z_sb) =>
+      val b2 = f(a, z_sb._1)
+      (b2, cons(b2, z_sb._2))
+    }._2
 }
 
 object Empty extends Stream[Nothing] {

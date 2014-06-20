@@ -130,4 +130,10 @@ class StreamSuite extends FunSuite {
     assert(List(3)     == ts.drop(2).head.toList)
     assert(Nil         == ts.drop(3).head.toList)
   }
+
+  test("16 Stream.scanRight return correct value") {
+    val s = Stream(1,2,3)
+
+    assert(List(6, 5, 3, 0) == s.scanRight(0)(_ + _).toList)
+  }
 }
