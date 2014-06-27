@@ -37,4 +37,27 @@ class StateSuite extends FunSuite {
     assert(id_rnd._1._2 >= 0.0)
     assert(id_rnd._1._2 < 1.0)
   }
+
+  test("RNG.intDouble returns correct value") {
+    val id_rnd = RNG.intDouble(RNG.Simple(42))
+    assert(id_rnd._1._2 >= 0.0)
+    assert(id_rnd._1._2 < 1.0)
+  }
+
+  test("RNG.doubleInt returns correct value") {
+    val id_rnd = RNG.doubleInt(RNG.Simple(42))
+    assert(id_rnd._1._1 >= 0.0)
+    assert(id_rnd._1._1 < 1.0)
+  }
+
+  test("7 RNG.sequence returns correct value") {
+    val rndList = RNG.sequence( List.fill(10)(RNG.nonNegativeEven) )(RNG.Simple(42))
+    assert(rndList._1.length == 10)
+    assert(rndList._1.forall( i => (i >= 0) && (i % 2 == 0)))
+  }
+  
+  test("7 RNG.ints returns correct value") {
+    val rndList: (List[Int], RNG) = RNG.ints(10)(RNG.Simple(42))
+    assert(rndList._1.length == 10)
+  }
 }

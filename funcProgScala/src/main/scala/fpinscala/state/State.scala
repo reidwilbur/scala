@@ -39,16 +39,11 @@ object RNG {
   def double: Rand[Double] = 
     map(nonNegativeInt)(i => i.toDouble/(Int.MaxValue.toDouble+1))
 
-  def intDouble(rng: RNG): ((Int, Double), RNG) = {
-    val (i, rng2) = rng.nextInt
-    val (d, rng3) = double(rng2)
-    ((i,d), rng3)
-  }
+  def intDouble: Rand[(Int, Double)] = 
+    map2(int, double)((_, _))
 
-  def doubleInt(rng: RNG): ((Double, Int), RNG) = {
-    val ((i, d), rng2) = intDouble(rng)
-    ((d,i), rng2)
-  }
+  def doubleInt: Rand[(Double, Int)] = 
+    map2(double, int)((_, _))
 
   def double3(rng: RNG): ((Double, Double, Double), RNG) = {
     val (d1, rng2) = double(rng)
@@ -58,15 +53,18 @@ object RNG {
     ((d1,d2,d3), rng4)
   }
 
-  def ints(count: Int)(rng: RNG): (List[Int], RNG) = {
-    def genInts(ccount: Int, l: List[Int], rng: RNG): (List[Int], RNG)  = 
-      if (ccount == 0) (l, rng) 
-      else {
-        val (i, nrng) = rng.nextInt
-        genInts(ccount-1, i :: l, nrng)
-      }
-    genInts(count, Nil, rng)
-  }
+  def ints(count: Int): Rand[List[Int]] = 
+  //(rng: RNG): (List[Int], RNG) = 
+  //{
+  //  def genInts(ccount: Int, l: List[Int], rng: RNG): (List[Int], RNG)  = 
+  //    if (ccount == 0) (l, rng) 
+  //    else {
+  //      val (i, nrng) = rng.nextInt
+  //      genInts(ccount-1, i :: l, nrng)
+  //    }
+  //  genInts(count, Nil, rng)
+  //}
+    sequence(List.fill(count)(int))
 
   def nonNegativeEven: Rand[Int] =
     map(nonNegativeInt)(i => i - i % 2)
@@ -77,7 +75,18 @@ object RNG {
       val (b, brng) = rb(arng)
       (f(a,b), brng)
     }
-    
+   
+  def both[A,B](ra: Rand[A], rb: Rand[B]): Rand[(A,B)] = 
+    map2(ra, rb)((_, _))
+
+  def sequence[A](ra: List[Rand[A]]): Rand[List[A]] = 
+    rng => {
+      ra.foldRight((Nil:List[A], rng)){ 
+        (rnd, l_rng) => 
+          val (a, rng1) = rnd(l_rng._2)
+          (a :: l_rng._1, rng1)
+      }
+    }
 }
 
 object State {
