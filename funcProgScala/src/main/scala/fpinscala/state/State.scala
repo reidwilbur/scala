@@ -36,11 +36,8 @@ object RNG {
     (if (i < 0) -(i + 1) else i, rng2)
   }
 
-  def double(rng: RNG): (Double, RNG) = {
-    val(i, rng2) = nonNegativeInt(rng)
-
-    (i.toDouble/(Int.MaxValue.toDouble+1), rng2)
-  }
+  def double: Rand[Double] = 
+    map(nonNegativeInt)(i => i.toDouble/(Int.MaxValue.toDouble+1))
 
   def intDouble(rng: RNG): ((Int, Double), RNG) = {
     val (i, rng2) = rng.nextInt
@@ -70,6 +67,17 @@ object RNG {
       }
     genInts(count, Nil, rng)
   }
+
+  def nonNegativeEven: Rand[Int] =
+    map(nonNegativeInt)(i => i - i % 2)
+
+  def map2[A,B,C](ra: Rand[A], rb: Rand[B])(f: (A,B) => C): Rand[C] = 
+    rng => {
+      val (a, arng) = ra(rng)
+      val (b, brng) = rb(arng)
+      (f(a,b), brng)
+    }
+    
 }
 
 object State {
