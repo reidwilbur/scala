@@ -60,4 +60,13 @@ class StateSuite extends FunSuite {
     val rndList: (List[Int], RNG) = RNG.ints(10)(RNG.Simple(42))
     assert(rndList._1.length == 10)
   }
+
+  test("10 RNG.nonNegativeLessThan returns correct value") {
+    val rng = RNG.Simple(42)
+    for( i <- 1 to 100 )
+      {
+        val (i , r) = RNG.nonNegativeLessThan(10)(rng)
+        assert( i < 10 && i >= 0)
+      }
+  }
 }
