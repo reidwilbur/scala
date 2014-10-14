@@ -23,4 +23,12 @@ class StateSuite extends FunSuite {
   test("nonNegative should add 1 and invert negative input") {
     assert(25 == RNG.nonNegativeInt(new ConstantRNG(-26))._1)
   }
+
+  test("double should return 0.0 as lowest value") {
+    assert(0.0 == RNG.double(new ConstantRNG(0))._1)
+  }
+
+  test("double should return < 1.0 as the highest value") {
+    assert(RNG.double(new ConstantRNG(Integer.MAX_VALUE))._1 < 1.0)
+  }
 }
