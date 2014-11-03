@@ -62,4 +62,24 @@ class StateSuite extends FunSuite {
     assert(List(-1) == RNG.ints(1)(rng)._1)
     assert(List(-1, -1, -1) == RNG.ints(3)(rng)._1)
   }
+
+  test("map2 should return combined Rand")
+  {
+    val rng = new ConstantRNG(-1)
+
+    val (di, rrng) = RNG.map2(RNG.int, RNG.double){ (i, d) => (d, i) }(rng)
+
+    assert(di == (0.0, -1))
+  }
+
+  test("sequence should return correct combinator")
+  {
+    val rng = new ConstantRNG(-1)
+
+    val d3Rand = RNG.sequence(List[RNG.Rand[Int]](RNG.nonNegativeInt, RNG.int, RNG.int))(_)
+
+    val (d3, rrng) = d3Rand(rng)
+
+    assert(d3 == List(0, -1, -1))
+  }
 }
