@@ -134,14 +134,7 @@ object State {
   def unit[S,A](a: A): State[S,A] = State(s => (a, s))
 
   def sequence[S,A](fs: List[State[S,A]]): State[S, List[A]] =
-    State[S, List[A]]( s => {
-      fs.foldRight( (List[A](), s) )( (state, accum) => {
-          val lastState = accum._2
-          val list = accum._1
-          val (a, nextState) = state.run(lastState)
-          (a :: list, nextState)
-        })
-    })
+    fs.foldRight(unit[S, List[A]](List()))( (f, acc) => f.map2(acc)(_ :: _))
 
   def sequence_r[S,A](fs: List[State[S,A]]): State[S, List[A]] = {
     def build(state: S, actions: List[State[S,A]], acc: List[A]): (List[A], S) = {
@@ -155,5 +148,58 @@ object State {
     State[S,List[A]](s => { build(s, fs, List[A]()) } )
   }
 
-  def simulateMachine(inputs: List[Input]): State[Machine, (Int, Int)] = ???
+  def modify[S](f: S => S): State[S, Unit] = for {
+    s <- get
+    _ <- set(f(s))
+  } yield()
+
+  def get[S]: State[S, S] = State(s => (s, s))
+
+  def set[S](s: S): State[S, Unit] = State(_ => ((), s))
+
+  def simulateMachineCombis(inputs: List[Input]): State[Machine, (Int, Int)] =
+      for {
+        _ <- sequence(inputs.map(i => modify((m:Machine) => (i, m) match {
+          case (_, Machine(_, 0, _)) =>
+            println("machine empty "+m)
+            m
+          case (Coin, Machine(false, _, _)) =>
+            println("machine ignoring coin "+m)
+            m
+          case (Turn, Machine(true, _, _)) =>
+            println("machine ignoring turn "+m)
+            m
+          case (Coin, Machine(true, candies, coins)) =>
+            val mm = Machine(false, candies, coins+1)
+            println("machine unlocked "+mm)
+            mm
+          case (Turn, Machine(false, candies, coins)) =>
+            val mm = Machine(true, candies-1, coins)
+            println("machine dispense "+mm)
+            mm
+        })))
+        s <- get
+      } yield(s.coins, s.candies)
+
+  def simulateMachine(inputs: List[Input]): State[Machine, (Int, Int)] =
+    State[Machine, (Int, Int)]( s => {
+        inputs.foldLeft( ((s.coins, s.candies), s) )( (acc, input) => {
+          val machine = acc._2
+          (input, machine) match {
+            case (Coin, Machine(_, candies, coins)) =>
+              val m = Machine(false, candies, coins+1)
+              ((m.coins, m.candies), m)
+
+            case (Turn, Machine(_, 0, _)) =>
+              ((machine.coins, machine.candies), machine)
+
+            case (Turn, Machine(false, candies, coins)) =>
+              val m = Machine(true, candies-1, coins)
+              ((m.coins, m.candies), m)
+
+            case (_, m) =>
+              ((m.coins, m.candies), m)
+          }
+        })
+      })
 }

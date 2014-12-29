@@ -104,4 +104,24 @@ class StateSuite extends FunSuite {
 
     assert(d3 == List(0, -1, -1))
   }
+
+  test("simulateMachine correctly simulates candy machine")
+  {
+    val m = Machine(true, 5, 10)
+
+    val (coins_candies, m2) = State.simulateMachine(List[Input](Coin, Turn, Turn, Coin, Turn, Coin, Turn, Coin, Turn)).run(m)
+
+    assert(coins_candies._1 == 14)
+    assert(coins_candies._2 == 1);
+  }
+
+  test("simulateMachineCombis correctly simulates candy machine")
+  {
+    val m = Machine(true, 5, 10)
+
+    val (coins_candies, m2) = State.simulateMachineCombis(List[Input](Coin, Turn, Coin, Turn, Coin, Turn, Coin, Turn)).run(m)
+
+    assert(coins_candies._1 == 14)
+    assert(coins_candies._2 == 1);
+  }
 }
