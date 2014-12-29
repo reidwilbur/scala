@@ -143,5 +143,17 @@ object State {
         })
     })
 
+  def sequence_r[S,A](fs: List[State[S,A]]): State[S, List[A]] = {
+    def build(state: S, actions: List[State[S,A]], acc: List[A]): (List[A], S) = {
+      actions match {
+        case Nil => (acc.reverse, state)
+        case action :: t =>
+          val (a, nextState) = action.run(state)
+          build(nextState, t, a :: acc)
+      }
+    }
+    State[S,List[A]](s => { build(s, fs, List[A]()) } )
+  }
+
   def simulateMachine(inputs: List[Input]): State[Machine, (Int, Int)] = ???
 }
