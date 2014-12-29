@@ -82,4 +82,15 @@ class StateSuite extends FunSuite {
 
     assert(d3 == List(0, -1, -1))
   }
+
+  test("State.sequence should return correct combinator")
+  {
+    val rng = new ConstantRNG(-1)
+
+    val d3Rand = State.sequence(List[State.Rand[Int]](State(RNG.nonNegativeInt), State(RNG.int), State(RNG.int)))
+
+    val (d3, rrng) = d3Rand.run(rng)
+
+    assert(d3 == List(0, -1, -1))
+  }
 }
