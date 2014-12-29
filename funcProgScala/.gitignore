@@ -2,4 +2,5 @@
 .classpath
 .settings
 .cache
+.idea/
 target/

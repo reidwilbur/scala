@@ -3,6 +3,8 @@ name := "progFuncScala"
 
 version := "0.0.1"
 
+scalaVersion := "2.10.4"
+
 resolvers ++= Seq(
   "Sonatype Releases" at "http://oss.sonatype.org/content/repositories/releases"
 )
