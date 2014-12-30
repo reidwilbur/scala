@@ -68,10 +68,10 @@ object Par {
       sequence(fbs)
     }
 
-  def parFilter[A](as: List[A])(f: A => Boolean): Par[List[A]] =
-    as.foldRight(unit(List[A]()))( (par: A, parlist: Par[List[A]]) => {
-      map2(unit(par), parlist)( (a: A, af: List[A]) => if (f(a)) a :: af else af )
-    })
+  def parFilter[A](as: List[A])(f: A => Boolean): Par[List[A]] = {
+    val listOfPars: List[Par[List[A]]] = as.map(asyncF( (a: A) => if (f(a)) List[A](a) else List[A]()) )
+    map(sequence(listOfPars))(_.flatten)
+  }
 }
 
 object Examples {
